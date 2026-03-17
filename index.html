@@ -1,0 +1,1487 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<title>Fixr — Local Services</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<style>
+/* ══════════════════════════════════ RESET & TOKENS ═══════════════════════ */
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{
+  --ink:#0d0d0d;  --bg:#f5f0e8;  --card:#ffffff;
+  --accent:#e8410a;  --accent2:#1a3c5e;  --muted:#7a7468;
+  --border:#e0d9ce;  --star:#f5a623;
+  --green:#16a34a;  --orange:#d97706;  --slate:#64748b;
+  --radius:14px;
+  --shadow:0 4px 24px rgba(0,0,0,.08);
+  --trans:all .25s cubic-bezier(.4,0,.2,1);
+}
+body{
+  font-family:'DM Sans',sans-serif;
+  background:var(--bg); color:var(--ink);
+  min-height:100vh;
+  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+}
+
+/* ══════════════════════════════════ HEADER ═══════════════════════════════ */
+header{
+  background:var(--accent2); color:#fff;
+  padding:16px 20px 14px;
+  position:sticky; top:0; z-index:50;
+  box-shadow:0 2px 16px rgba(0,0,0,.18);
+}
+.h-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
+.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-.03em;flex-shrink:0;line-height:1}
+.logo-dot{color:var(--accent)}
+.logo-v{font-size:.6rem;vertical-align:super;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-weight:400;margin-left:2px}
+.h-right{display:flex;align-items:center;gap:7px}
+.lang-btn{
+  background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2);
+  color:#fff; padding:5px 10px; border-radius:100px;
+  font-size:.72rem; font-weight:700; cursor:pointer;
+  transition:var(--trans); font-family:'DM Sans',sans-serif; letter-spacing:.04em;
+}
+.lang-btn:hover,.lang-btn.active{background:rgba(255,255,255,.22)}
+.h-auth-btn{
+  background:var(--accent); border:none; color:#fff;
+  padding:7px 15px; border-radius:100px;
+  font-size:.78rem; font-weight:600; cursor:pointer;
+  transition:var(--trans); font-family:'DM Sans',sans-serif; white-space:nowrap;
+}
+.h-auth-btn:hover{background:#c93508;transform:scale(1.02)}
+.h-dash-btn{
+  background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.25);
+  color:#fff; padding:7px 13px; border-radius:100px;
+  font-size:.78rem; font-weight:600; cursor:pointer;
+  transition:var(--trans); font-family:'DM Sans',sans-serif; white-space:nowrap;
+}
+.h-dash-btn:hover{background:rgba(255,255,255,.22)}
+
+/* ══════════════════════════════════ VIEWS ════════════════════════════════ */
+.view{display:none}
+.view.active{display:block}
+
+/* ══════════════════════════════════ CUSTOMER VIEW ════════════════════════ */
+.loc-bar{max-width:680px;margin:0 auto;padding:0 20px}
+.loc-pill{
+  display:inline-flex;align-items:center;gap:6px;
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:100px;padding:6px 14px;font-size:.8rem;color:var(--muted);
+  margin-top:-16px;box-shadow:var(--shadow);position:relative;z-index:2;
+}
+.loc-pill svg{color:var(--accent);flex-shrink:0}
+
+.sec-label{
+  max-width:680px;margin:24px auto 12px;padding:0 20px;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;
+  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+}
+
+.cats-wrap{max-width:680px;margin:0 auto;padding:0 20px}
+.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
+.cats::-webkit-scrollbar{display:none}
+.cat-btn{
+  display:flex;flex-direction:column;align-items:center;gap:5px;
+  flex-shrink:0;background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:12px 14px 10px;min-width:74px;
+  cursor:pointer;transition:var(--trans);
+  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;color:var(--muted);
+}
+.cat-btn .emo{font-size:1.3rem;line-height:1}
+.cat-btn:hover{border-color:var(--accent2);color:var(--accent2);transform:translateY(-2px)}
+.cat-btn.active{
+  background:var(--accent2);border-color:var(--accent2);color:#fff;
+  box-shadow:0 6px 20px rgba(26,60,94,.32);transform:translateY(-2px);
+}
+
+.res-hdr{
+  max-width:680px;margin:22px auto 12px;padding:0 20px;
+  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+}
+.res-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700}
+.res-meta{display:flex;align-items:center;gap:10px}
+.res-count{font-size:.77rem;color:var(--muted)}
+.avail-toggle{
+  display:flex;align-items:center;gap:5px;
+  font-size:.74rem;color:var(--muted);cursor:pointer;user-select:none;
+}
+.avail-toggle input{accent-color:var(--accent2)}
+
+/* ── cards ── */
+#cards{max-width:680px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:12px}
+.w-card{
+  background:var(--card);border:1.5px solid var(--border);
+  border-radius:var(--radius);padding:16px 18px;
+  display:flex;align-items:center;gap:14px;
+  box-shadow:var(--shadow);
+  animation:slideUp .3s both;transition:var(--trans);
+}
+.w-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.1)}
+.w-card.busy{opacity:.62}
+@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
+
+.ava{
+  width:50px;height:50px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:#fff;
+  flex-shrink:0;position:relative;
+}
+.sdot{
+  position:absolute;bottom:0;right:0;
+  width:12px;height:12px;border-radius:50%;border:2px solid var(--card);
+}
+.sdot.available{background:var(--green)}
+.sdot.on_job{background:var(--orange)}
+.sdot.unavailable{background:var(--slate)}
+
+.w-info{flex:1;min-width:0}
+.w-name{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.93rem;
+  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+}
+.w-meta{display:flex;align-items:center;gap:7px;margin-top:4px;flex-wrap:wrap}
+.stars{display:flex;align-items:center;gap:1px;font-size:.67rem}
+.star{color:var(--star)}.star.e{color:#ddd}
+.rnum{font-size:.74rem;font-weight:500;margin-left:2px;color:var(--ink)}
+.dist-b{
+  font-size:.68rem;color:var(--muted);background:var(--bg);
+  padding:2px 7px;border-radius:100px;
+  display:inline-flex;align-items:center;gap:3px;
+}
+.st-b{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:100px}
+.st-b.available{background:#dcfce7;color:#15803d}
+.st-b.on_job{background:#fef3c7;color:#b45309}
+.st-b.unavailable{background:#f1f5f9;color:var(--slate)}
+.next-slot{font-size:.64rem;color:var(--muted);margin-top:3px}
+
+.card-acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0}
+.call-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent2);color:#fff;border:none;
+  border-radius:100px;padding:8px 14px;font-size:.75rem;font-weight:600;
+  cursor:pointer;text-decoration:none;transition:var(--trans);
+  font-family:'DM Sans',sans-serif;
+}
+.call-btn:hover{background:#0f2a45}
+.call-btn.off{background:#cbd5e1;cursor:not-allowed}
+.book-btn{
+  display:inline-flex;align-items:center;gap:5px;
+  background:var(--accent);color:#fff;border:none;
+  border-radius:100px;padding:8px 14px;font-size:.75rem;font-weight:600;
+  cursor:pointer;transition:var(--trans);font-family:'DM Sans',sans-serif;
+}
+.book-btn:hover{background:#c93508}
+
+/* ── My Bookings (customer) ── */
+#my-bk-section{max-width:680px;margin:28px auto 0;padding:0 20px;display:none}
+#my-bk-section.show{display:block}
+.bk-hdr{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:12px}
+
+/* ══════════════════════════════════ STATE BOX ════════════════════════════ */
+.sbox{padding:34px 20px;text-align:center}
+.sbox .ico{font-size:2.8rem;margin-bottom:10px}
+.sbox .msg{color:var(--muted);font-size:.86rem;line-height:1.5}
+.spin{
+  width:30px;height:30px;border:3px solid var(--border);
+  border-top-color:var(--accent2);border-radius:50%;
+  animation:spin .7s linear infinite;margin:0 auto 12px;
+}
+@keyframes spin{to{transform:rotate(360deg)}}
+
+/* ══════════════════════════════════ DASHBOARDS ═══════════════════════════ */
+.dash-hdr{background:var(--accent2);color:#fff;padding:16px 20px 14px}
+.dash-hdr-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
+.back-btn{
+  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.22);
+  color:#fff;padding:6px 12px;border-radius:100px;
+  font-size:.74rem;font-weight:600;cursor:pointer;transition:var(--trans);
+  font-family:'DM Sans',sans-serif;flex-shrink:0;
+}
+.back-btn:hover{background:rgba(255,255,255,.22)}
+.dash-ttl{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem}
+.dash-sub{font-size:.74rem;color:rgba(255,255,255,.55);margin-top:2px}
+
+.dash-body{max-width:680px;margin:20px auto;padding:0 20px;display:flex;flex-direction:column;gap:15px}
+
+.d-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
+.d-ttl{
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:14px;display:flex;align-items:center;gap:6px;
+}
+
+/* ── Profile ── */
+.prof-row{display:flex;align-items:center;gap:14px}
+.prof-ava{
+  width:56px;height:56px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;color:#fff;flex-shrink:0;
+}
+.pname{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem}
+.pcat{font-size:.79rem;color:var(--muted);text-transform:capitalize;margin-top:2px}
+.prating{color:var(--star);font-size:.76rem;margin-top:3px}
+
+/* ── Status opts ── */
+.st-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.st-opt{
+  border:2px solid var(--border);border-radius:10px;
+  padding:10px 6px;cursor:pointer;transition:var(--trans);
+  text-align:center;background:var(--bg);
+}
+.st-opt:hover{border-color:var(--accent2)}
+.st-opt.sel-available{border-color:var(--green);background:#f0fdf4}
+.st-opt.sel-on_job{border-color:var(--orange);background:#fffbeb}
+.st-opt.sel-unavailable{border-color:var(--slate);background:#f8fafc}
+.st-opt .se{font-size:1.3rem;margin-bottom:4px}
+.st-opt .sl{font-size:.71rem;font-weight:700;font-family:'Syne',sans-serif}
+.st-opt .sd{font-size:.63rem;color:var(--muted);margin-top:2px}
+
+/* ── Slots ── */
+.slots-list{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}
+.slot-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-radius:8px;padding:8px 12px;font-size:.79rem;
+}
+.slot-tag{
+  background:var(--accent2);color:#fff;
+  border-radius:100px;padding:2px 9px;font-size:.64rem;font-weight:600;margin-right:6px;
+}
+.slot-del{
+  background:none;border:none;color:var(--muted);cursor:pointer;
+  font-size:.8rem;padding:2px 6px;border-radius:4px;transition:var(--trans);
+}
+.slot-del:hover{background:#fee2e2;color:#b91c1c}
+.slot-form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:9px}
+.f-in{
+  background:var(--bg);border:1.5px solid var(--border);
+  border-radius:8px;padding:8px 10px;font-size:.79rem;
+  font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:var(--trans);width:100%;
+}
+.f-in:focus{border-color:var(--accent2);background:#fff}
+.slot-add-btn{
+  background:var(--accent);color:#fff;border:none;
+  border-radius:8px;padding:8px 12px;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:var(--trans);font-family:'DM Sans',sans-serif;white-space:nowrap;width:100%;
+  grid-column:1/-1;
+}
+.slot-add-btn:hover{background:#c93508}
+
+/* ── Bookings list (worker) ── */
+.bk-row{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--bg);border-radius:8px;padding:10px 12px;gap:8px;font-size:.79rem;
+}
+.bk-row+.bk-row{margin-top:7px}
+.bk-info{flex:1;min-width:0}
+.bk-who{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.bk-date{font-size:.7rem;color:var(--muted);margin-top:2px}
+.bk-st{font-size:.66rem;font-weight:600;padding:2px 8px;border-radius:100px;white-space:nowrap}
+.bk-st.pending{background:#fef3c7;color:#b45309}
+.bk-st.confirmed{background:#dcfce7;color:#15803d}
+.bk-st.cancelled{background:#fee2e2;color:#b91c1c}
+.bk-st.completed{background:#dbeafe;color:#1d4ed8}
+.bk-st.in_progress{background:#f0fdf4;color:var(--green)}
+
+/* ── Assistant input ── */
+.asst-form{display:flex;gap:8px;margin-top:4px}
+.asst-form .f-in{flex:1}
+.asst-form button{
+  background:var(--accent2);color:#fff;border:none;
+  border-radius:8px;padding:9px 14px;font-size:.78rem;font-weight:600;
+  cursor:pointer;transition:var(--trans);font-family:'DM Sans',sans-serif;white-space:nowrap;
+}
+.asst-form button:hover{background:#0f2a45}
+
+/* ── Save / action btn ── */
+.btn-save{
+  width:100%;background:var(--green);color:#fff;border:none;
+  border-radius:100px;padding:13px;font-size:.88rem;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:var(--trans);
+}
+.btn-save:hover{background:#15803d}
+.save-ok{
+  background:#dcfce7;border:1.5px solid #86efac;
+  border-radius:10px;padding:10px 14px;font-size:.8rem;color:#15803d;
+  font-weight:500;display:none;align-items:center;gap:7px;margin-bottom:4px;
+}
+.save-ok.show{display:flex}
+
+/* ── Assistant dash ── */
+.lw-box{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:10px;padding:12px 14px}
+.lw-ava{
+  width:44px;height:44px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0;
+}
+.lw-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem}
+.lw-cat{font-size:.73rem;color:var(--muted);text-transform:capitalize;margin-top:2px}
+
+/* ══════════════════════════════════ MODALS ═══════════════════════════════ */
+.m-ov{
+  position:fixed;inset:0;background:rgba(13,13,13,.55);
+  backdrop-filter:blur(5px);z-index:200;
+  display:none;align-items:center;justify-content:center;padding:16px;
+}
+.m-ov.open{display:flex}
+.modal{
+  background:var(--card);border-radius:20px;padding:26px 22px;
+  max-width:420px;width:100%;
+  box-shadow:0 24px 80px rgba(0,0,0,.22);
+  position:relative;animation:mIn .28s cubic-bezier(.4,0,.2,1);
+  max-height:92vh;overflow-y:auto;
+}
+@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;scale(1) translateY(0)}}
+.m-x{
+  position:absolute;top:12px;right:12px;
+  background:var(--bg);border:none;border-radius:50%;
+  width:28px;height:28px;font-size:.85rem;cursor:pointer;
+  color:var(--muted);display:flex;align-items:center;justify-content:center;transition:var(--trans);
+}
+.m-x:hover{background:var(--border);color:var(--ink)}
+.m-ttl{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:4px}
+.m-sub{font-size:.79rem;color:var(--muted);margin-bottom:18px;line-height:1.5}
+
+.f-label{
+  font-size:.7rem;font-weight:700;font-family:'Syne',sans-serif;
+  letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
+  margin-bottom:5px;display:block;
+}
+.f-input{
+  width:100%;background:var(--bg);border:1.5px solid var(--border);
+  border-radius:10px;padding:10px 13px;font-size:.87rem;
+  font-family:'DM Sans',sans-serif;color:var(--ink);
+  transition:var(--trans);outline:none;margin-bottom:13px;
+}
+.f-input:focus{border-color:var(--accent2);background:#fff}
+.f-err{
+  background:#fee2e2;color:#b91c1c;border-radius:8px;
+  padding:9px 12px;font-size:.78rem;margin-bottom:12px;display:none;
+}
+.f-err.show{display:block}
+.f-note{font-size:.74rem;color:var(--muted);margin-bottom:13px}
+.btn-prim{
+  width:100%;background:var(--accent2);color:#fff;border:none;
+  border-radius:100px;padding:12px;font-size:.87rem;font-weight:600;
+  font-family:'DM Sans',sans-serif;cursor:pointer;transition:var(--trans);margin-top:2px;
+}
+.btn-prim:hover{background:#0f2a45;transform:translateY(-1px)}
+.btn-prim:disabled{background:#cbd5e1;cursor:not-allowed;transform:none}
+
+.step{display:none}.step.active{display:block}
+.otp-sent-note{
+  background:#dbeafe;color:#1d4ed8;border-radius:8px;
+  padding:9px 12px;font-size:.78rem;margin-bottom:13px;display:none;
+}
+.otp-sent-note.show{display:block}
+
+/* ── Booking modal ── */
+.bm-worker{
+  display:flex;align-items:center;gap:12px;
+  background:var(--bg);border-radius:10px;padding:11px 13px;margin-bottom:16px;
+}
+.bm-ava{
+  width:40px;height:40px;border-radius:50%;
+  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0;
+}
+.bm-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem}
+.bm-cat{font-size:.73rem;color:var(--muted);text-transform:capitalize;margin-top:2px}
+
+.slot-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;min-height:34px}
+.slot-chip{
+  border:1.5px solid var(--border);border-radius:100px;
+  padding:5px 12px;font-size:.74rem;cursor:pointer;
+  transition:var(--trans);background:var(--bg);
+}
+.slot-chip:hover{border-color:var(--accent2)}
+.slot-chip.sel{background:var(--accent2);border-color:var(--accent2);color:#fff}
+.slot-chip.taken{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.no-slots-msg{font-size:.78rem;color:var(--muted);font-style:italic}
+
+/* ══════════════════════════════════ BOTTOM NAV ═══════════════════════════ */
+.bnav{
+  position:fixed;bottom:0;left:0;right:0;
+  background:var(--card);border-top:1.5px solid var(--border);
+  display:flex;z-index:100;
+  padding-bottom:env(safe-area-inset-bottom,0px);
+  box-shadow:0 -4px 20px rgba(0,0,0,.07);
+}
+.bn-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:10px 6px 8px;cursor:pointer;transition:var(--trans);
+  border:none;background:none;color:var(--muted);
+  font-family:'DM Sans',sans-serif;font-size:.63rem;font-weight:500;gap:3px;
+}
+.bn-item svg{width:19px;height:19px;stroke-width:1.8}
+.bn-item.active{color:var(--accent2)}
+.bn-item:hover{color:var(--accent2)}
+
+/* ══════════════════════════════════ TOAST ════════════════════════════════ */
+#toast{
+  position:fixed;bottom:82px;left:50%;
+  transform:translateX(-50%) translateY(60px);
+  background:var(--ink);color:#fff;
+  padding:9px 18px;border-radius:100px;
+  font-size:.79rem;font-weight:500;
+  opacity:0;transition:all .28s ease;
+  z-index:400;white-space:nowrap;pointer-events:none;
+}
+#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══════════════════════════════════ MOBILE ═══════════════════════════════ */
+@media(max-width:520px){
+  .modal{
+    border-radius:22px 22px 0 0;margin-top:auto;
+    max-height:90vh;padding:22px 18px;
+  }
+  .m-ov{align-items:flex-end;padding:0}
+  header{padding:12px 16px 11px}
+  .logo{font-size:1.5rem}
+  #cards,.dash-body,.res-hdr,.cats-wrap,.loc-bar,.sec-label,#my-bk-section{
+    padding-left:14px;padding-right:14px;
+  }
+  .w-card{padding:13px 15px;gap:11px}
+  .ava{width:44px;height:44px}
+  .slot-form{grid-template-columns:1fr 1fr}
+  .st-opts{grid-template-columns:repeat(3,1fr)}
+  .card-acts{gap:5px}
+  .call-btn,.book-btn{padding:7px 11px;font-size:.72rem}
+  .h-right{gap:5px}
+  .h-auth-btn{padding:6px 11px;font-size:.74rem}
+}
+</style>
+</head>
+<body>
+
+<!-- ═══════════════════════════════ HEADER ════════════════════════════════ -->
+<header>
+  <div class="h-inner">
+    <div class="logo">Fixr<span class="logo-dot">.</span><span class="logo-v">v2</span></div>
+    <div class="h-right">
+      <button class="lang-btn" id="langBtn" onclick="toggleLang()">தமிழ்</button>
+      <button class="h-dash-btn" id="dashBtn" style="display:none" onclick="openDash()">Dashboard</button>
+      <button class="h-auth-btn" id="authBtn" onclick="handleAuthBtn()">Login</button>
+    </div>
+  </div>
+</header>
+
+<!-- ═══════════════════════════════ CUSTOMER VIEW ════════════════════════ -->
+<section id="v-customer" class="view active">
+  <div class="loc-bar">
+    <div class="loc-pill">
+      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+      </svg>
+      <span id="locText">Madurai, Tamil Nadu</span>
+    </div>
+  </div>
+
+  <p class="sec-label" id="whatNeedLabel">What do you need?</p>
+  <div class="cats-wrap">
+    <div class="cats" id="cats">
+      <button class="cat-btn active" data-service="electrician"><span class="emo">⚡</span><span data-i18n="cat_electrician">Electrician</span></button>
+      <button class="cat-btn" data-service="plumber"><span class="emo">🔧</span><span data-i18n="cat_plumber">Plumber</span></button>
+      <button class="cat-btn" data-service="carpenter"><span class="emo">🪚</span><span data-i18n="cat_carpenter">Carpenter</span></button>
+      <button class="cat-btn" data-service="painter"><span class="emo">🖌️</span><span data-i18n="cat_painter">Painter</span></button>
+      <button class="cat-btn" data-service="cleaner"><span class="emo">🧹</span><span data-i18n="cat_cleaner">Cleaner</span></button>
+      <button class="cat-btn" data-service="ac_technician"><span class="emo">❄️</span><span data-i18n="cat_ac_technician">AC Tech</span></button>
+    </div>
+  </div>
+
+  <div class="res-hdr">
+    <span class="res-title" id="resTitle">Electricians nearby</span>
+    <div class="res-meta">
+      <span class="res-count" id="resCount"></span>
+      <label class="avail-toggle">
+        <input type="checkbox" id="availFilter" checked onchange="loadWorkers()">
+        <span data-i18n="available_only">Available only</span>
+      </label>
+    </div>
+  </div>
+  <div id="cards"></div>
+
+  <!-- Customer bookings -->
+  <div id="my-bk-section">
+    <p class="bk-hdr" data-i18n="my_bookings_title">My Bookings</p>
+    <div id="my-bk-list"></div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ WORKER DASHBOARD ═════════════════════ -->
+<section id="v-worker" class="view">
+  <div class="dash-hdr">
+    <div class="dash-hdr-inner">
+      <button class="back-btn" onclick="showView('v-customer')" data-i18n="back">← Back</button>
+      <div>
+        <div class="dash-ttl" data-i18n="worker_dash_title">Worker Dashboard</div>
+        <div class="dash-sub" id="wDashSub">Manage your profile</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <!-- Profile -->
+    <div class="d-card">
+      <div class="d-ttl">👤 <span data-i18n="your_profile">Your Profile</span></div>
+      <div class="prof-row">
+        <div class="prof-ava" id="wAva"></div>
+        <div>
+          <div class="pname" id="wName"></div>
+          <div class="pcat" id="wCat"></div>
+          <div class="prating" id="wRating"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="d-card">
+      <div class="d-ttl">🔵 <span data-i18n="current_status">Current Status</span></div>
+      <div class="st-opts">
+        <div class="st-opt" id="sopt-available" onclick="setWorkerStatus('available')">
+          <div class="se">✅</div>
+          <div class="sl" style="color:var(--green)" data-i18n="st_available">Available</div>
+          <div class="sd" data-i18n="st_available_desc">Ready for work</div>
+        </div>
+        <div class="st-opt" id="sopt-on_job" onclick="setWorkerStatus('on_job')">
+          <div class="se">🔨</div>
+          <div class="sl" style="color:var(--orange)" data-i18n="st_on_job">On a Job</div>
+          <div class="sd" data-i18n="st_on_job_desc">Currently busy</div>
+        </div>
+        <div class="st-opt" id="sopt-unavailable" onclick="setWorkerStatus('unavailable')">
+          <div class="se">🚫</div>
+          <div class="sl" style="color:var(--slate)" data-i18n="st_unavailable">Unavailable</div>
+          <div class="sd" data-i18n="st_unavailable_desc">Not working</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Time Slots -->
+    <div class="d-card">
+      <div class="d-ttl">📅 <span data-i18n="time_slots">Time Slots</span></div>
+      <div class="slots-list" id="slotsList"></div>
+      <div class="slot-form">
+        <input class="f-in" type="date" id="slotDate" placeholder="Date"/>
+        <input class="f-in" type="text" id="slotStart" placeholder="e.g. 09:00"/>
+        <input class="f-in" type="text" id="slotEnd"   placeholder="e.g. 13:00"/>
+      </div>
+      <button class="slot-add-btn" onclick="addSlot()" data-i18n="add_slot">+ Add Slot</button>
+    </div>
+
+    <!-- My Bookings (worker view) -->
+    <div class="d-card">
+      <div class="d-ttl">📋 <span data-i18n="my_bookings">My Bookings</span></div>
+      <div id="wBookingsList"><div class="sbox"><p class="msg" data-i18n="no_bookings">No bookings yet</p></div></div>
+    </div>
+
+    <!-- Add Assistant -->
+    <div class="d-card">
+      <div class="d-ttl">🤝 <span data-i18n="add_assistant">Add Assistant</span></div>
+      <p class="f-note" data-i18n="add_assistant_note">Link an assistant by their phone number.</p>
+      <div class="asst-form">
+        <input class="f-in" type="text" id="asstPhone" placeholder="+91-XXXXXXXXXX" style="margin:0"/>
+        <button onclick="requestAssistant()" data-i18n="link_btn">Link →</button>
+      </div>
+    </div>
+
+    <div class="save-ok" id="saveOk">✅ <span data-i18n="saved_msg">Changes saved!</span></div>
+    <button class="btn-save" onclick="saveWorkerChanges()" data-i18n="save_changes">Save Changes</button>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ ASSISTANT DASHBOARD ══════════════════ -->
+<section id="v-assistant" class="view">
+  <div class="dash-hdr">
+    <div class="dash-hdr-inner">
+      <button class="back-btn" onclick="showView('v-customer')" data-i18n="back">← Back</button>
+      <div>
+        <div class="dash-ttl" data-i18n="assistant_dash_title">Assistant Dashboard</div>
+        <div class="dash-sub" id="aDashSub">Manage your availability</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="dash-body">
+    <!-- Profile -->
+    <div class="d-card">
+      <div class="d-ttl">👤 <span data-i18n="your_profile">Your Profile</span></div>
+      <div class="prof-row">
+        <div class="prof-ava" id="aAva"></div>
+        <div>
+          <div class="pname" id="aName"></div>
+          <div class="pcat" data-i18n="role_assistant">Assistant</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Status -->
+    <div class="d-card">
+      <div class="d-ttl">🔵 <span data-i18n="current_status">Current Status</span></div>
+      <div class="st-opts">
+        <div class="st-opt" id="asopt-available" onclick="setAssistantStatus('available')">
+          <div class="se">✅</div>
+          <div class="sl" style="color:var(--green)" data-i18n="st_available">Available</div>
+          <div class="sd" data-i18n="st_available_desc">Ready for work</div>
+        </div>
+        <div class="st-opt" id="asopt-on_job" onclick="setAssistantStatus('on_job')">
+          <div class="se">🔨</div>
+          <div class="sl" style="color:var(--orange)" data-i18n="st_on_job">On a Job</div>
+          <div class="sd" data-i18n="st_on_job_desc">Currently busy</div>
+        </div>
+        <div class="st-opt" id="asopt-unavailable" onclick="setAssistantStatus('unavailable')">
+          <div class="se">🚫</div>
+          <div class="sl" style="color:var(--slate)" data-i18n="st_unavailable">Unavailable</div>
+          <div class="sd" data-i18n="st_unavailable_desc">Not working</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Linked worker -->
+    <div class="d-card">
+      <div class="d-ttl">🔗 <span data-i18n="linked_worker">Linked Worker</span></div>
+      <div id="linkedWorkerInfo"></div>
+    </div>
+  </div>
+</section>
+
+<!-- ═══════════════════════════════ LOGIN MODAL ════════════════════════════ -->
+<div class="m-ov" id="m-login">
+  <div class="modal">
+    <button class="m-x" onclick="closeModal('m-login')">✕</button>
+    <div class="m-ttl" data-i18n="login_title">Welcome to Fixr</div>
+    <p class="m-sub" data-i18n="login_sub">Enter your phone to continue</p>
+
+    <!-- Step 1: Phone -->
+    <div class="step active" id="step-phone">
+      <div class="f-err" id="loginErr"></div>
+      <label class="f-label" data-i18n="lbl_name">Your Name <span style="color:var(--muted);font-weight:400">(new users)</span></label>
+      <input class="f-input" id="loginName" type="text" placeholder="Full name (optional)"/>
+      <label class="f-label" data-i18n="lbl_phone">Phone Number</label>
+      <input class="f-input" id="loginPhone" type="tel" placeholder="+91-98201-11111"
+             onkeydown="if(event.key==='Enter')sendOtp()"/>
+      <div class="f-note" data-i18n="otp_note">You will receive a one-time password</div>
+      <button class="btn-prim" id="sendOtpBtn" onclick="sendOtp()" data-i18n="send_otp">Send OTP</button>
+    </div>
+
+    <!-- Step 2: OTP -->
+    <div class="step" id="step-otp">
+      <div class="otp-sent-note show" id="otpSentNote"></div>
+      <div class="f-err" id="otpErr"></div>
+      <label class="f-label" data-i18n="lbl_otp">One-Time Password</label>
+      <input class="f-input" id="otpInput" type="text" maxlength="6" placeholder="000000"
+             onkeydown="if(event.key==='Enter')verifyOtp()" style="letter-spacing:.2em;font-size:1.2rem;text-align:center"/>
+      <button class="btn-prim" id="verifyOtpBtn" onclick="verifyOtp()" data-i18n="verify_otp">Verify &amp; Login</button>
+      <button onclick="goToStep('step-phone')" style="width:100%;background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;margin-top:10px;font-family:'DM Sans',sans-serif" data-i18n="change_phone">← Change phone number</button>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ BOOKING MODAL ═════════════════════════ -->
+<div class="m-ov" id="m-booking">
+  <div class="modal">
+    <button class="m-x" onclick="closeModal('m-booking')">✕</button>
+    <div class="m-ttl" data-i18n="book_service">Book a Service</div>
+    <p class="m-sub" data-i18n="book_sub">Choose a date and available slot</p>
+
+    <div class="bm-worker" id="bmWorkerInfo"></div>
+
+    <div class="f-err" id="bookErr"></div>
+    <label class="f-label" data-i18n="lbl_date">Select Date</label>
+    <input class="f-input" type="date" id="bookDate" onchange="loadBookingSlots()"/>
+
+    <label class="f-label" data-i18n="lbl_slot">Available Slots</label>
+    <div class="slot-chips" id="slotChips">
+      <span class="no-slots-msg" data-i18n="pick_date_first">Pick a date to see slots</span>
+    </div>
+
+    <label class="f-label" data-i18n="lbl_notes">Notes (optional)</label>
+    <input class="f-input" id="bookNotes" type="text" placeholder="Describe your issue…"/>
+
+    <button class="btn-prim" onclick="confirmBooking()" data-i18n="confirm_booking">Confirm Booking</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════ BOTTOM NAV ════════════════════════════ -->
+<nav class="bnav" id="bnav">
+  <button class="bn-item active" id="bn-home" onclick="navTo('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
+    </svg>
+    <span data-i18n="nav_home">Home</span>
+  </button>
+  <button class="bn-item" id="bn-auth" onclick="navTo('auth')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
+    </svg>
+    <span id="bnAuthLabel" data-i18n="nav_login">Login</span>
+  </button>
+  <button class="bn-item" id="bn-bookings" style="display:none" onclick="navTo('bookings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
+      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
+    </svg>
+    <span data-i18n="nav_bookings">Bookings</span>
+  </button>
+</nav>
+
+<div id="toast"></div>
+
+<!-- ═══════════════════════════════ JAVASCRIPT ════════════════════════════ -->
+<script>
+/* ══════════════════════════════ CONFIG ══════════════════════════════════ */
+const API_BASE = "";
+
+/* ══════════════════════════════ TRANSLATIONS ════════════════════════════ */
+const TR = {
+  en: {
+    app_tagline:"Trusted local professionals, nearby",
+    what_need:"What do you need?",
+    available_only:"Available only",
+    found:"found",
+    call_now:"Call Now",
+    book_now:"Book Now",
+    busy:"Busy",
+    login_btn:"Login",
+    worker_portal:"Worker Portal",
+    logout_btn:"Logout",
+    dashboard_btn:"Dashboard",
+    back:"← Back",
+
+    st_available:"Available",  st_available_desc:"Ready for work",
+    st_on_job:"On a Job",       st_on_job_desc:"Currently busy",
+    st_unavailable:"Unavailable", st_unavailable_desc:"Not working",
+
+    login_title:"Welcome to Fixr",
+    login_sub:"Enter your phone number to continue",
+    lbl_name:"Your Name",  lbl_phone:"Phone Number",
+    otp_note:"You will receive a one-time password",
+    send_otp:"Send OTP", otp_sent_msg:"OTP sent! Check the server console.",
+    lbl_otp:"One-Time Password", verify_otp:"Verify & Login",
+    change_phone:"← Change phone number",
+
+    worker_dash_title:"Worker Dashboard",
+    your_profile:"Your Profile", current_status:"Current Status",
+    time_slots:"Time Slots", my_bookings:"My Bookings",
+    my_bookings_title:"My Bookings",
+    add_assistant:"Add Assistant",
+    add_assistant_note:"Link an assistant by their phone number.",
+    link_btn:"Link →", no_bookings:"No bookings yet",
+    add_slot:"+ Add Slot", save_changes:"Save Changes", saved_msg:"Changes saved!",
+    role_assistant:"Assistant",
+
+    assistant_dash_title:"Assistant Dashboard",
+    linked_worker:"Linked Worker",
+    no_linked_worker:"No worker linked yet",
+
+    book_service:"Book a Service",
+    book_sub:"Choose a date and available slot",
+    lbl_date:"Select Date", lbl_slot:"Available Slots",
+    lbl_notes:"Notes (optional)", confirm_booking:"Confirm Booking",
+    pick_date_first:"Pick a date to see slots",
+    no_slots_available:"No slots available for this date",
+    booking_success:"Booking confirmed! ✅",
+
+    nav_home:"Home", nav_login:"Login", nav_dashboard:"Dashboard", nav_bookings:"Bookings",
+
+    cat_electrician:"Electrician", cat_plumber:"Plumber",
+    cat_carpenter:"Carpenter",     cat_painter:"Painter",
+    cat_cleaner:"Cleaner",         cat_ac_technician:"AC Tech",
+
+    nearby:"nearby",
+    bk_pending:"Pending",  bk_confirmed:"Confirmed",
+    bk_cancelled:"Cancelled", bk_completed:"Completed",
+    bk_in_progress:"In Progress",
+    next_slot:"Next:",
+  },
+  ta: {
+    app_tagline:"நம்பகமான உள்ளூர் நிபுணர்கள், அருகில்",
+    what_need:"உங்களுக்கு என்ன தேவை?",
+    available_only:"கிடைக்கக்கூடியவர்கள் மட்டும்",
+    found:"கண்டறியப்பட்டது",
+    call_now:"அழைக்கவும்",
+    book_now:"முன்பதிவு",
+    busy:"பிஸி",
+    login_btn:"உள்நுழைவு",
+    worker_portal:"தொழிலாளர் போர்டல்",
+    logout_btn:"வெளியேறு",
+    dashboard_btn:"டாஷ்போர்டு",
+    back:"← திரும்பு",
+
+    st_available:"கிடைக்கிறார்",   st_available_desc:"வேலைக்கு தயார்",
+    st_on_job:"வேலையில்",           st_on_job_desc:"தற்போது பிஸி",
+    st_unavailable:"கிடைக்கவில்லை", st_unavailable_desc:"இல்லை",
+
+    login_title:"Fixr-க்கு வரவேற்கிறோம்",
+    login_sub:"தொடர உங்கள் தொலைபேசி எண்ணை உள்ளிடுக",
+    lbl_name:"உங்கள் பெயர்",  lbl_phone:"தொலைபேசி எண்",
+    otp_note:"ஒரு முறை கடவுச்சொல் அனுப்பப்படும்",
+    send_otp:"OTP அனுப்பு", otp_sent_msg:"OTP அனுப்பப்பட்டது! சர்வர் கன்சோலில் பார்க்கவும்.",
+    lbl_otp:"OTP (ஒரு முறை கடவுச்சொல்)", verify_otp:"சரிபார்த்து உள்நுழை",
+    change_phone:"← தொலைபேசி எண்ணை மாற்று",
+
+    worker_dash_title:"தொழிலாளர் டாஷ்போர்டு",
+    your_profile:"உங்கள் சுயவிவரம்", current_status:"தற்போதைய நிலை",
+    time_slots:"நேர இடைவெளிகள்", my_bookings:"என் முன்பதிவுகள்",
+    my_bookings_title:"என் முன்பதிவுகள்",
+    add_assistant:"உதவியாளர் சேர்",
+    add_assistant_note:"உதவியாளரின் தொலைபேசி எண் மூலம் இணைக்கவும்.",
+    link_btn:"இணை →", no_bookings:"முன்பதிவுகள் இல்லை",
+    add_slot:"+ இடைவெளி சேர்", save_changes:"மாற்றங்களை சேமி", saved_msg:"சேமிக்கப்பட்டது! ✅",
+    role_assistant:"உதவியாளர்",
+
+    assistant_dash_title:"உதவியாளர் டாஷ்போர்டு",
+    linked_worker:"இணைக்கப்பட்ட தொழிலாளர்",
+    no_linked_worker:"இன்னும் தொழிலாளர் இணைக்கப்படவில்லை",
+
+    book_service:"சேவையை முன்பதிவு செய்",
+    book_sub:"தேதி மற்றும் நேர இடைவெளியை தேர்ந்தெடுக்கவும்",
+    lbl_date:"தேதி தேர்ந்தெடு", lbl_slot:"கிடைக்கக்கூடிய நேர இடைவெளிகள்",
+    lbl_notes:"குறிப்புகள் (விருப்பத்திற்கு)", confirm_booking:"முன்பதிவை உறுதிப்படுத்து",
+    pick_date_first:"நேர இடைவெளிகளை காண தேதியை தேர்ந்தெடுக்கவும்",
+    no_slots_available:"இந்த தேதியில் இடைவெளிகள் இல்லை",
+    booking_success:"முன்பதிவு உறுதிப்படுத்தப்பட்டது! ✅",
+
+    nav_home:"முகப்பு", nav_login:"உள்நுழைவு", nav_dashboard:"டாஷ்போர்டு", nav_bookings:"முன்பதிவுகள்",
+
+    cat_electrician:"மின்சாரி", cat_plumber:"குழாய்ப் பணி",
+    cat_carpenter:"தச்சர்",     cat_painter:"ஓவியர்",
+    cat_cleaner:"சுத்தகார்",    cat_ac_technician:"AC தொழில்நுட்பி",
+
+    nearby:"அருகில்",
+    bk_pending:"நிலுவையில்", bk_confirmed:"உறுதிப்படுத்தப்பட்டது",
+    bk_cancelled:"ரத்து",      bk_completed:"முடிந்தது",
+    bk_in_progress:"நடந்துகொண்டிருக்கிறது",
+    next_slot:"அடுத்து:",
+  }
+};
+
+/* ══════════════════════════════ STATE ═══════════════════════════════════ */
+const S = {
+  token:   localStorage.getItem("fixr_token"),
+  user:    JSON.parse(localStorage.getItem("fixr_user")    || "null"),
+  profile: JSON.parse(localStorage.getItem("fixr_profile") || "null"),
+  lang:    localStorage.getItem("fixr_lang") || "en",
+  cat:     "electrician",
+  bookingWorker:   null,
+  bookingSlotId:   null,
+  workerSlotsLocal: [],
+};
+
+/* ══════════════════════════════ HELPERS ══════════════════════════════════ */
+function t(k){ return (TR[S.lang]||TR.en)[k] || k }
+
+function initials(name){
+  return (name||"?").split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+}
+
+function stars(r){
+  let h="";
+  for(let i=1;i<=5;i++){
+    if(i<=Math.floor(r)) h+=`<span class="star">★</span>`;
+    else if(i===Math.ceil(r)&&r%1>=0.5) h+=`<span class="star">½</span>`;
+    else h+=`<span class="star e">☆</span>`;
+  }
+  return h;
+}
+
+let _tt;
+function toast(msg){ clearTimeout(_tt); const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); _tt=setTimeout(()=>el.classList.remove("show"),2800); }
+
+function setBtn(id,txt,disabled){
+  const b=document.getElementById(id);
+  if(!b)return; b.textContent=txt; b.disabled=!!disabled;
+}
+
+/* ══════════════════════════════ API FETCH ════════════════════════════════ */
+async function api(method, path, body=null){
+  const opts = {
+    method,
+    headers: {
+      "Content-Type":"application/json",
+      ...(S.token?{"Authorization":`Bearer ${S.token}`}:{})
+    }
+  };
+  if(body) opts.body = JSON.stringify(body);
+  try{
+    const res = await fetch(`${API_BASE}${path}`, opts);
+    return res.json();
+  }catch(e){
+    return {success:false,error:"Cannot reach server — is Flask running?"};
+  }
+}
+
+/* ══════════════════════════════ i18n APPLY ═══════════════════════════════ */
+function applyLang(){
+  document.documentElement.lang = S.lang==="ta"?"ta":"en";
+  document.querySelectorAll("[data-i18n]").forEach(el=>{
+    const k = el.dataset.i18n;
+    if(TR[S.lang]?.[k]) el.textContent = TR[S.lang][k];
+  });
+  document.getElementById("langBtn").textContent = S.lang==="en"?"தமிழ்":"English";
+  document.getElementById("whatNeedLabel").textContent = t("what_need");
+  const af=document.querySelector(".avail-toggle span[data-i18n='available_only']");
+  if(af) af.textContent=t("available_only");
+  updateHeaderBtns();
+}
+
+function toggleLang(){
+  S.lang = S.lang==="en"?"ta":"en";
+  localStorage.setItem("fixr_lang",S.lang);
+  applyLang();
+  loadWorkers();
+}
+
+/* ══════════════════════════════ VIEW MANAGEMENT ══════════════════════════ */
+function showView(id){
+  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
+  document.getElementById(id).classList.add("active");
+  // nav highlight
+  document.querySelectorAll(".bn-item").forEach(b=>b.classList.remove("active"));
+  if(id==="v-customer") document.getElementById("bn-home").classList.add("active");
+}
+
+/* ══════════════════════════════ HEADER BUTTONS ═══════════════════════════ */
+function updateHeaderBtns(){
+  const authBtn  = document.getElementById("authBtn");
+  const dashBtn  = document.getElementById("dashBtn");
+  const bnAuth   = document.getElementById("bn-auth");
+  const bnBk     = document.getElementById("bn-bookings");
+  const bnAuthLbl= document.getElementById("bnAuthLabel");
+
+  if(S.user){
+    authBtn.textContent = t("logout_btn");
+    dashBtn.style.display = "inline-block";
+    dashBtn.textContent = t("dashboard_btn");
+    bnAuthLbl.textContent = t("nav_dashboard");
+    if(S.user.role==="customer") bnBk.style.display="flex";
+  } else {
+    authBtn.textContent = t("login_btn");
+    dashBtn.style.display = "none";
+    bnAuthLbl.textContent = t("nav_login");
+    bnBk.style.display = "none";
+    document.getElementById("my-bk-section").classList.remove("show");
+  }
+}
+
+function handleAuthBtn(){
+  if(S.user) logout();
+  else openModal("m-login");
+}
+
+function openDash(){
+  if(!S.user) return openModal("m-login");
+  if(S.user.role==="worker")    openWorkerDash();
+  else if(S.user.role==="assistant") openAssistantDash();
+}
+
+/* ══════════════════════════════ CUSTOMER WORKERS ═════════════════════════ */
+const CAT_LABELS = {
+  electrician:"cat_electrician", plumber:"cat_plumber",
+  carpenter:"cat_carpenter",     painter:"cat_painter",
+  cleaner:"cat_cleaner",         ac_technician:"cat_ac_technician"
+};
+const ST_LABELS = { available:"st_available", on_job:"st_on_job", unavailable:"st_unavailable" };
+
+async function loadWorkers(){
+  const container = document.getElementById("cards");
+  const availOnly = document.getElementById("availFilter").checked;
+  container.innerHTML = `<div class="sbox"><div class="spin"></div></div>`;
+
+  const statusQ = availOnly ? "&status=available" : "";
+  const data = await api("GET", `/api/workers?service=${S.cat}${statusQ}`);
+
+  document.getElementById("resTitle").textContent =
+    `${t(CAT_LABELS[S.cat]||S.cat)} ${t("nearby")}`;
+
+  if(!data.success){
+    container.innerHTML = `<div class="sbox"><div class="ico">⚠️</div><p class="msg">${data.error}</p></div>`;
+    return;
+  }
+
+  document.getElementById("resCount").textContent = data.count ? `${data.count} ${t("found")}` : "";
+
+  if(!data.workers.length){
+    container.innerHTML = `<div class="sbox"><div class="ico">😕</div><p class="msg">No workers found.<br>Try unchecking "Available only".</p></div>`;
+    return;
+  }
+
+  container.innerHTML = "";
+  data.workers.forEach((w,i)=>{
+    const st    = w.status || "unavailable";
+    const canCall = st==="available";
+    const canBook = S.user?.role==="customer" && canCall;
+    const nextSlot = w.next_slot
+      ? `<div class="next-slot">${t("next_slot")} ${w.next_slot.date} ${w.next_slot.start_time}–${w.next_slot.end_time}</div>`
+      : "";
+    const card = document.createElement("div");
+    card.className = `w-card${st!=="available"?" busy":""}`;
+    card.style.animationDelay = `${i*50}ms`;
+    card.innerHTML = `
+      <div class="ava">${initials(w.name)}<div class="sdot ${st}"></div></div>
+      <div class="w-info">
+        <div class="w-name">${w.name}</div>
+        <div class="w-meta">
+          <div class="stars">${stars(w.rating)}<span class="rnum">${w.rating}</span></div>
+          <span class="dist-b">📍 ${w.distance_km} km</span>
+          <span class="st-b ${st}">${t(ST_LABELS[st]||st)}</span>
+        </div>
+        ${nextSlot}
+      </div>
+      <div class="card-acts">
+        ${canCall
+          ? `<button class="call-btn" onclick="callWorker('${w.name}','${w.phone}')">📞 ${t("call_now")}</button>`
+          : `<button class="call-btn off" disabled>${t("busy")}</button>`}
+        ${canBook
+          ? `<button class="book-btn" onclick="openBookingModal(${JSON.stringify(w).replace(/"/g,'&quot;')})">📅 ${t("book_now")}</button>`
+          : ""}
+      </div>`;
+    container.appendChild(card);
+  });
+}
+
+function callWorker(name, phone){
+  toast(`📞 Calling ${name}…`);
+  setTimeout(()=>window.open(`tel:${phone}`),200);
+}
+
+/* ══════════════════════════════ CATEGORY TABS ════════════════════════════ */
+document.querySelectorAll(".cat-btn").forEach(btn=>{
+  btn.addEventListener("click",()=>{
+    document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
+    btn.classList.add("active");
+    S.cat = btn.dataset.service;
+    loadWorkers();
+  });
+});
+
+/* ══════════════════════════════ LOGIN MODAL ══════════════════════════════ */
+function openModal(id){
+  document.getElementById(id).classList.add("open");
+  if(id==="m-login"){
+    goToStep("step-phone");
+    setTimeout(()=>document.getElementById("loginPhone").focus(),120);
+  }
+}
+
+function closeModal(id){
+  document.getElementById(id).classList.remove("open");
+  // Reset login form
+  if(id==="m-login"){
+    document.getElementById("loginPhone").value="";
+    document.getElementById("loginName").value="";
+    document.getElementById("otpInput").value="";
+    document.getElementById("loginErr").classList.remove("show");
+    document.getElementById("otpErr").classList.remove("show");
+  }
+  if(id==="m-booking"){
+    document.getElementById("bookDate").value="";
+    document.getElementById("slotChips").innerHTML=`<span class="no-slots-msg">${t("pick_date_first")}</span>`;
+    document.getElementById("bookNotes").value="";
+    S.bookingSlotId=null;
+    document.getElementById("bookErr").classList.remove("show");
+  }
+}
+
+// Close on overlay click
+document.querySelectorAll(".m-ov").forEach(ov=>{
+  ov.addEventListener("click",e=>{
+    if(e.target===ov) closeModal(ov.id);
+  });
+});
+
+function goToStep(stepId){
+  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
+  document.getElementById(stepId).classList.add("active");
+}
+
+async function sendOtp(){
+  const phone = document.getElementById("loginPhone").value.trim();
+  const name  = document.getElementById("loginName").value.trim();
+  const errEl = document.getElementById("loginErr");
+  errEl.classList.remove("show");
+
+  if(!phone){ errEl.textContent="Phone number is required"; errEl.classList.add("show"); return; }
+
+  setBtn("sendOtpBtn","Sending…",true);
+  const res = await api("POST","/api/send-otp",{phone,name});
+  setBtn("sendOtpBtn",t("send_otp"),false);
+
+  if(!res.success){
+    errEl.textContent=res.error||"Failed to send OTP";
+    errEl.classList.add("show");
+    return;
+  }
+
+  document.getElementById("otpSentNote").textContent = t("otp_sent_msg");
+  goToStep("step-otp");
+  setTimeout(()=>document.getElementById("otpInput").focus(),100);
+}
+
+async function verifyOtp(){
+  const phone = document.getElementById("loginPhone").value.trim();
+  const name  = document.getElementById("loginName").value.trim();
+  const otp   = document.getElementById("otpInput").value.trim();
+  const errEl = document.getElementById("otpErr");
+  errEl.classList.remove("show");
+
+  if(!otp){ errEl.textContent="Please enter the OTP"; errEl.classList.add("show"); return; }
+
+  setBtn("verifyOtpBtn","Verifying…",true);
+  const res = await api("POST","/api/verify-otp",{phone,otp,name});
+  setBtn("verifyOtpBtn",t("verify_otp"),false);
+
+  if(!res.success){
+    errEl.textContent=res.error||"Invalid OTP";
+    errEl.classList.add("show");
+    return;
+  }
+
+  // Store session
+  S.token   = res.token;
+  S.user    = res.user;
+  S.profile = res.profile;
+  localStorage.setItem("fixr_token",   S.token);
+  localStorage.setItem("fixr_user",    JSON.stringify(S.user));
+  localStorage.setItem("fixr_profile", JSON.stringify(S.profile));
+
+  closeModal("m-login");
+  toast(`👋 Welcome, ${S.user.name}!`);
+  updateHeaderBtns();
+  applyLang();
+  loadWorkers();
+
+  // Auto-open dashboard for workers/assistants
+  if(S.user.role==="worker")     openWorkerDash();
+  else if(S.user.role==="assistant") openAssistantDash();
+  else {
+    loadMyBookings();
+    showView("v-customer");
+  }
+}
+
+function logout(){
+  S.token=S.user=S.profile=null;
+  localStorage.removeItem("fixr_token");
+  localStorage.removeItem("fixr_user");
+  localStorage.removeItem("fixr_profile");
+  toast("👋 Logged out");
+  updateHeaderBtns();
+  showView("v-customer");
+  loadWorkers();
+}
+
+/* ══════════════════════════════ WORKER DASHBOARD ═════════════════════════ */
+async function openWorkerDash(){
+  if(!S.user||S.user.role!=="worker") return;
+  showView("v-worker");
+  document.getElementById("bn-auth").classList.add("active");
+  document.getElementById("bn-home").classList.remove("active");
+
+  const data = await api("GET","/api/me");
+  if(!data.success) return;
+  S.profile = data.profile;
+
+  const w = S.profile;
+  document.getElementById("wAva").textContent    = initials(S.user.name);
+  document.getElementById("wName").textContent   = S.user.name;
+  document.getElementById("wCat").textContent    = t(CAT_LABELS[w.category]||w.category);
+  document.getElementById("wRating").textContent = "★".repeat(Math.round(w.rating))+" "+w.rating+"/5";
+  document.getElementById("wDashSub").textContent = `Hi ${S.user.name.split(" ")[0]} 👋`;
+
+  highlightStatus(w.status,"sopt");
+  loadWorkerSlots();
+  loadWorkerBookings();
+}
+
+function highlightStatus(status,prefix){
+  ["available","on_job","unavailable"].forEach(s=>{
+    const el = document.getElementById(`${prefix}-${s}`);
+    if(!el)return;
+    el.className="st-opt"+(status===s?` sel-${s}`:"");
+  });
+}
+
+async function setWorkerStatus(status){
+  if(!S.profile) return;
+  const res = await api("PUT",`/api/workers/${S.profile.id}/status`,{status});
+  if(res.success){
+    S.profile.status=status;
+    highlightStatus(status,"sopt");
+    toast(`Status: ${t(ST_LABELS[status])}`);
+    loadWorkers();
+  } else {
+    toast("❌ "+res.error);
+  }
+}
+
+async function loadWorkerSlots(){
+  if(!S.profile) return;
+  const res = await api("GET",`/api/workers/${S.profile.id}/slots`);
+  const el  = document.getElementById("slotsList");
+  if(!res.success){ el.innerHTML="<p style='font-size:.78rem;color:var(--muted)'>Could not load slots</p>"; return; }
+  S.workerSlotsLocal = res.slots;
+  renderSlots();
+}
+
+function renderSlots(){
+  const el = document.getElementById("slotsList");
+  if(!S.workerSlotsLocal.length){
+    el.innerHTML=`<p style="font-size:.78rem;color:var(--muted)" data-i18n="no_slots">${t("no_slots")}</p>`;
+    return;
+  }
+  el.innerHTML = S.workerSlotsLocal.map(s=>`
+    <div class="slot-row">
+      <span>
+        <span class="slot-tag">${s.date}</span>
+        ${s.start_time} – ${s.end_time}
+        ${s.is_booked?'<span style="font-size:.65rem;color:var(--orange)"> (booked)</span>':""}
+      </span>
+      ${!s.is_booked
+        ? `<button class="slot-del" onclick="deleteSlot(${s.id})">✕</button>`
+        : `<span style="font-size:.7rem;color:var(--orange)">🔒</span>`}
+    </div>`
+  ).join("");
+}
+
+async function addSlot(){
+  const date  = document.getElementById("slotDate").value;
+  const start = document.getElementById("slotStart").value.trim();
+  const end   = document.getElementById("slotEnd").value.trim();
+  if(!date||!start||!end){ toast("⚠️ Fill in date, start and end time"); return; }
+
+  const res = await api("POST",`/api/workers/${S.profile.id}/slots`,
+    {date,start_time:start,end_time:end});
+  if(res.success){
+    S.workerSlotsLocal.push(res.slot);
+    renderSlots();
+    document.getElementById("slotDate").value="";
+    document.getElementById("slotStart").value="";
+    document.getElementById("slotEnd").value="";
+    toast("✅ Slot added");
+  } else {
+    toast("❌ "+res.error);
+  }
+}
+
+async function deleteSlot(slotId){
+  const res = await api("DELETE",`/api/slots/${slotId}`);
+  if(res.success){
+    S.workerSlotsLocal = S.workerSlotsLocal.filter(s=>s.id!==slotId);
+    renderSlots();
+    toast("🗑️ Slot removed");
+  } else {
+    toast("❌ "+res.error);
+  }
+}
+
+async function loadWorkerBookings(){
+  if(!S.profile) return;
+  const res = await api("GET",`/api/workers/${S.profile.id}/bookings`);
+  const el  = document.getElementById("wBookingsList");
+  if(!res.success||!res.bookings.length){
+    el.innerHTML=`<div class="sbox"><p class="msg" data-i18n="no_bookings">${t("no_bookings")}</p></div>`;
+    return;
+  }
+  const BK_ST = { pending:"bk_pending",confirmed:"bk_confirmed",cancelled:"bk_cancelled",completed:"bk_completed",in_progress:"bk_in_progress" };
+  el.innerHTML = res.bookings.map(b=>`
+    <div class="bk-row">
+      <div class="bk-info">
+        <div class="bk-who">📞 ${b.customer_name}</div>
+        <div class="bk-date">📅 ${b.date} ${b.customer_phone||""}</div>
+        ${b.notes?`<div class="bk-date">📝 ${b.notes}</div>`:""}
+      </div>
+      <span class="bk-st ${b.status}">${t(BK_ST[b.status]||b.status)}</span>
+    </div>`
+  ).join("");
+}
+
+async function requestAssistant(){
+  const phone = document.getElementById("asstPhone").value.trim();
+  if(!phone){ toast("⚠️ Enter assistant's phone number"); return; }
+  const res = await api("POST","/api/assistant/request",{phone});
+  if(res.success){
+    toast("✅ "+res.message);
+    document.getElementById("asstPhone").value="";
+  } else {
+    toast("❌ "+res.error);
+  }
+}
+
+function saveWorkerChanges(){
+  const ok=document.getElementById("saveOk");
+  ok.classList.add("show");
+  toast(t("saved_msg"));
+  setTimeout(()=>ok.classList.remove("show"),3000);
+}
+
+/* ══════════════════════════════ ASSISTANT DASHBOARD ═════════════════════ */
+async function openAssistantDash(){
+  if(!S.user||S.user.role!=="assistant") return;
+  showView("v-assistant");
+  document.getElementById("bn-auth").classList.add("active");
+
+  document.getElementById("aAva").textContent  = initials(S.user.name);
+  document.getElementById("aName").textContent = S.user.name;
+  document.getElementById("aDashSub").textContent = `Hi ${S.user.name.split(" ")[0]} 👋`;
+
+  const res = await api("GET","/api/assistant/profile");
+  if(!res.success) return;
+
+  const st = res.assistant?.status||"unavailable";
+  highlightStatus(st,"asopt");
+
+  const lwEl = document.getElementById("linkedWorkerInfo");
+  if(res.linked_worker){
+    const lw = res.linked_worker;
+    lwEl.innerHTML = `<div class="lw-box">
+      <div class="lw-ava">${initials(lw.name)}</div>
+      <div><div class="lw-name">${lw.name}</div>
+           <div class="lw-cat">${t(CAT_LABELS[lw.category]||lw.category)} • ${lw.phone}</div></div>
+    </div>`;
+  } else {
+    lwEl.innerHTML = `<p style="font-size:.8rem;color:var(--muted)">${t("no_linked_worker")}</p>`;
+  }
+}
+
+async function setAssistantStatus(status){
+  const res = await api("PUT","/api/assistant/status",{status});
+  if(res.success){
+    highlightStatus(status,"asopt");
+    toast(`Status: ${t(ST_LABELS[status])}`);
+  } else {
+    toast("❌ "+res.error);
+  }
+}
+
+/* ══════════════════════════════ BOOKING MODAL ════════════════════════════ */
+function openBookingModal(worker){
+  if(!S.user){ toast("Please login to book"); openModal("m-login"); return; }
+  S.bookingWorker = worker;
+  S.bookingSlotId = null;
+
+  const bm = document.getElementById("bmWorkerInfo");
+  bm.innerHTML = `
+    <div class="bm-ava">${initials(worker.name)}</div>
+    <div>
+      <div class="bm-name">${worker.name}</div>
+      <div class="bm-cat">${t(CAT_LABELS[worker.category]||worker.category)} • ⭐${worker.rating} • 📍${worker.distance_km}km</div>
+    </div>`;
+
+  // Set min date to today
+  const today = new Date().toISOString().split("T")[0];
+  document.getElementById("bookDate").min = today;
+  document.getElementById("slotChips").innerHTML =
+    `<span class="no-slots-msg">${t("pick_date_first")}</span>`;
+
+  openModal("m-booking");
+}
+
+async function loadBookingSlots(){
+  const date = document.getElementById("bookDate").value;
+  const el   = document.getElementById("slotChips");
+  S.bookingSlotId = null;
+  if(!date||!S.bookingWorker){ el.innerHTML=`<span class="no-slots-msg">${t("pick_date_first")}</span>`; return; }
+
+  el.innerHTML = `<div class="spin" style="margin:0"></div>`;
+  const res = await api("GET",`/api/workers/${S.bookingWorker.id}/slots?date=${date}`);
+  if(!res.success||!res.slots.length){
+    el.innerHTML=`<span class="no-slots-msg">${t("no_slots_available")}</span>`; return;
+  }
+  el.innerHTML = res.slots.map(s=>`
+    <div class="slot-chip${s.is_booked?' taken':''}"
+         onclick="${s.is_booked?'':'selectSlot('+s.id+',this)'}"
+         data-slot-id="${s.id}">
+      ${s.start_time}–${s.end_time}${s.is_booked?' 🔒':''}
+    </div>`).join("");
+}
+
+function selectSlot(slotId, el){
+  document.querySelectorAll(".slot-chip").forEach(c=>c.classList.remove("sel"));
+  el.classList.add("sel");
+  S.bookingSlotId = slotId;
+}
+
+async function confirmBooking(){
+  const date  = document.getElementById("bookDate").value;
+  const notes = document.getElementById("bookNotes").value.trim();
+  const errEl = document.getElementById("bookErr");
+  errEl.classList.remove("show");
+
+  if(!date){ errEl.textContent="Please select a date"; errEl.classList.add("show"); return; }
+
+  const body = {
+    worker_id:    S.bookingWorker.id,
+    date,
+    notes,
+    ...(S.bookingSlotId?{time_slot_id:S.bookingSlotId}:{})
+  };
+
+  const res = await api("POST","/api/bookings",body);
+  if(res.success){
+    closeModal("m-booking");
+    toast(t("booking_success"));
+    loadMyBookings();
+    loadWorkers();
+  } else {
+    errEl.textContent = res.error||"Booking failed";
+    errEl.classList.add("show");
+  }
+}
+
+/* ══════════════════════════════ MY BOOKINGS (customer) ══════════════════ */
+async function loadMyBookings(){
+  if(!S.user||S.user.role!=="customer") return;
+  const sec  = document.getElementById("my-bk-section");
+  const el   = document.getElementById("my-bk-list");
+  sec.classList.add("show");
+
+  const res = await api("GET","/api/bookings/my");
+  if(!res.success||!res.bookings.length){
+    el.innerHTML=`<p style="font-size:.8rem;color:var(--muted)">${t("no_bookings")}</p>`;
+    return;
+  }
+  const BK_ST={pending:"bk_pending",confirmed:"bk_confirmed",cancelled:"bk_cancelled",completed:"bk_completed",in_progress:"bk_in_progress"};
+  el.innerHTML = res.bookings.map(b=>`
+    <div class="bk-row">
+      <div class="bk-info">
+        <div class="bk-who">${b.worker_name} <span style="font-size:.7rem;color:var(--muted);text-transform:capitalize">(${t(CAT_LABELS[b.category]||b.category)})</span></div>
+        <div class="bk-date">📅 ${b.date}${b.notes?` — ${b.notes}`:""}</div>
+      </div>
+      <span class="bk-st ${b.status}">${t(BK_ST[b.status]||b.status)}</span>
+    </div>`).join("");
+}
+
+/* ══════════════════════════════ BOTTOM NAV ═══════════════════════════════ */
+function navTo(dest){
+  if(dest==="home"){ showView("v-customer"); loadWorkers(); }
+  else if(dest==="auth"){
+    if(!S.user) openModal("m-login");
+    else if(S.user.role==="worker") openWorkerDash();
+    else if(S.user.role==="assistant") openAssistantDash();
+    else {
+      showView("v-customer");
+      loadMyBookings();
+      document.getElementById("my-bk-section").scrollIntoView({behavior:"smooth"});
+    }
+  }
+  else if(dest==="bookings"){
+    showView("v-customer");
+    loadMyBookings();
+    setTimeout(()=>document.getElementById("my-bk-section").scrollIntoView({behavior:"smooth"}),200);
+  }
+}
+
+/* ══════════════════════════════ INIT ════════════════════════════════════ */
+(function init(){
+  applyLang();
+  updateHeaderBtns();
+  loadWorkers();
+  if(S.user&&S.user.role==="customer") loadMyBookings();
+})();
+</script>
+</body>
+</html>
