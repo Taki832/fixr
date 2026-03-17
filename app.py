@@ -669,6 +669,7 @@ def send_otp():
     }
 
     log.info(f"event=otp_sent phone={_mp(phone)} ip={_ip()}")
+    log.info(f"OTP_DEBUG phone={phone} otp={otp}")
 
     # Simulate SMS — print to server console (replace with real SMS provider)
     print(f"\n{'='*50}")
