@@ -484,7 +484,8 @@ def internal_error(e):
 
 @app.route("/api/send-otp", methods=["POST"])
 def send_otp():
-    data            = request.json or {}
+    data = request.json or {}
+
     phone, phone_err = _validate_phone(data.get("phone", ""))
     if phone_err:
         log.warning(f"event=otp_invalid_phone ip={_ip()} reason={phone_err}")
@@ -496,23 +497,23 @@ def send_otp():
         return err(rate_err, 429)
 
     name = _s(data.get("name", ""), MAX_NAME_LEN)
-  otp  = str(secrets.randbelow(900000) + 100000)
 
-_OTP_STORE[phone] = {
-    "otp":        otp,
-    "expires_at": time.time() + OTP_TTL,
-    "name":       name,
-}
+    otp = str(secrets.randbelow(900000) + 100000)
 
-print("\n================ OTP DEBUG ================")
-print(f"PHONE: {phone}")
-print(f"OTP:   {otp}")
-print("=========================================\n")
+    _OTP_STORE[phone] = {
+        "otp": otp,
+        "expires_at": time.time() + OTP_TTL,
+        "name": name,
+    }
+
+    print("\n================ OTP DEBUG ================")
+    print(f"PHONE: {phone}")
+    print(f"OTP:   {otp}")
+    print("=========================================\n")
 
     log.info(f"event=otp_sent phone={_mp(phone)} ip={_ip()}")
-    print(f"\n{'='*52}\n  📱 OTP  →  {phone}  :  {otp}\n{'='*52}\n")
 
-    return ok({"message": "OTP sent — check the server console"})
+    return ok({"message": "OTP sent"})
 
 
 @app.route("/api/verify-otp", methods=["POST"])
