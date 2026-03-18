@@ -3,1484 +3,1614 @@
 <head>
 <meta charset="UTF-8"/>
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"/>
+<meta name="theme-color" content="#0a0f14"/>
 <title>Fixr — Local Services</title>
 <link rel="preconnect" href="https://fonts.googleapis.com"/>
-<link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;600;700;800&family=DM+Sans:wght@300;400;500;600&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Display:ital@0;1&family=Instrument+Sans:wght@400;500;600;700&display=swap" rel="stylesheet"/>
 <style>
-/* ══════════════════════════════════ RESET & TOKENS ═══════════════════════ */
+/* ─── RESET ───────────────────────────────────────────────────── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html{-webkit-tap-highlight-color:transparent;scroll-behavior:smooth}
+button,input,select,textarea{font:inherit}
+
+/* ─── TOKENS ─────────────────────────────────────────────────── */
 :root{
-  --ink:#0d0d0d;  --bg:#f5f0e8;  --card:#ffffff;
-  --accent:#e8410a;  --accent2:#1a3c5e;  --muted:#7a7468;
-  --border:#e0d9ce;  --star:#f5a623;
-  --green:#16a34a;  --orange:#d97706;  --slate:#64748b;
-  --radius:14px;
-  --shadow:0 4px 24px rgba(0,0,0,.08);
-  --trans:all .25s cubic-bezier(.4,0,.2,1);
+  --bg:        #0a0f14;
+  --surface:   #111820;
+  --card:      #16202b;
+  --card-hov:  #1c2c3d;
+  --border:    #1f2f40;
+  --border2:   #263546;
+
+  --ink:       #e8edf2;
+  --ink2:      #8fa3b8;
+  --ink3:      #566a7e;
+
+  --gold:      #d4993a;
+  --gold-dim:  rgba(212,153,58,.12);
+  --gold-glow: rgba(212,153,58,.25);
+
+  --teal:      #2bbfa0;
+  --teal-dim:  rgba(43,191,160,.1);
+
+  --red:       #e05252;
+  --red-dim:   rgba(224,82,82,.1);
+
+  --amber:     #e0963a;
+  --amber-dim: rgba(224,150,58,.1);
+
+  --green:     #3abf7a;
+  --green-dim: rgba(58,191,122,.1);
+
+  --r:         12px;
+  --r-sm:      8px;
+  --r-lg:      18px;
+  --trans:     all .2s cubic-bezier(.4,0,.2,1);
+  --shadow:    0 8px 40px rgba(0,0,0,.5);
+  --shadow-sm: 0 2px 12px rgba(0,0,0,.35);
 }
+
+/* ─── BASE ───────────────────────────────────────────────────── */
 body{
-  font-family:'DM Sans',sans-serif;
-  background:var(--bg); color:var(--ink);
+  font-family:'Instrument Sans',sans-serif;
+  background:var(--bg);
+  color:var(--ink);
   min-height:100vh;
-  padding-bottom:calc(72px + env(safe-area-inset-bottom));
+  overflow-x:hidden;
+  padding-bottom:calc(68px + env(safe-area-inset-bottom));
 }
+h1,h2,h3{font-family:'DM Serif Display',serif;font-weight:400;line-height:1.15}
+a{color:inherit;text-decoration:none}
 
-/* ══════════════════════════════════ HEADER ═══════════════════════════════ */
-header{
-  background:var(--accent2); color:#fff;
-  padding:16px 20px 14px;
-  position:sticky; top:0; z-index:50;
-  box-shadow:0 2px 16px rgba(0,0,0,.18);
-}
-.h-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;justify-content:space-between;gap:10px}
-.logo{font-family:'Syne',sans-serif;font-weight:800;font-size:1.75rem;letter-spacing:-.03em;flex-shrink:0;line-height:1}
-.logo-dot{color:var(--accent)}
-.logo-v{font-size:.6rem;vertical-align:super;color:rgba(255,255,255,.5);font-family:'DM Sans',sans-serif;font-weight:400;margin-left:2px}
-.h-right{display:flex;align-items:center;gap:7px}
-.lang-btn{
-  background:rgba(255,255,255,.1); border:1.5px solid rgba(255,255,255,.2);
-  color:#fff; padding:5px 10px; border-radius:100px;
-  font-size:.72rem; font-weight:700; cursor:pointer;
-  transition:var(--trans); font-family:'DM Sans',sans-serif; letter-spacing:.04em;
-}
-.lang-btn:hover,.lang-btn.active{background:rgba(255,255,255,.22)}
-.h-auth-btn{
-  background:var(--accent); border:none; color:#fff;
-  padding:7px 15px; border-radius:100px;
-  font-size:.78rem; font-weight:600; cursor:pointer;
-  transition:var(--trans); font-family:'DM Sans',sans-serif; white-space:nowrap;
-}
-.h-auth-btn:hover{background:#c93508;transform:scale(1.02)}
-.h-dash-btn{
-  background:rgba(255,255,255,.12); border:1.5px solid rgba(255,255,255,.25);
-  color:#fff; padding:7px 13px; border-radius:100px;
-  font-size:.78rem; font-weight:600; cursor:pointer;
-  transition:var(--trans); font-family:'DM Sans',sans-serif; white-space:nowrap;
-}
-.h-dash-btn:hover{background:rgba(255,255,255,.22)}
+/* scrollbar */
+::-webkit-scrollbar{width:4px;height:4px}
+::-webkit-scrollbar-track{background:transparent}
+::-webkit-scrollbar-thumb{background:var(--border2);border-radius:4px}
 
-/* ══════════════════════════════════ VIEWS ════════════════════════════════ */
-.view{display:none}
+/* ─── LAYOUT ─────────────────────────────────────────────────── */
+.container{max-width:680px;margin:0 auto;padding:0 16px}
+
+/* ─── HEADER ─────────────────────────────────────────────────── */
+#header{
+  position:sticky;top:0;z-index:100;
+  background:rgba(10,15,20,.88);
+  backdrop-filter:blur(20px);
+  -webkit-backdrop-filter:blur(20px);
+  border-bottom:1px solid var(--border);
+}
+.header-inner{
+  max-width:680px;margin:0 auto;
+  display:flex;align-items:center;
+  padding:0 16px;height:56px;gap:8px;
+}
+.logo{
+  font-family:'DM Serif Display',serif;
+  font-size:1.45rem;letter-spacing:-.02em;
+  color:var(--ink);flex:1;
+  display:flex;align-items:center;gap:6px;
+}
+.logo-dot{color:var(--gold)}
+.logo-tag{
+  font-family:'Instrument Sans',sans-serif;
+  font-size:.6rem;font-weight:600;
+  color:var(--ink3);letter-spacing:.1em;
+  text-transform:uppercase;padding:2px 6px;
+  border:1px solid var(--border2);border-radius:4px;
+  margin-left:2px;
+}
+.header-actions{display:flex;align-items:center;gap:6px}
+
+/* ─── BUTTONS ────────────────────────────────────────────────── */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  gap:6px;border:none;cursor:pointer;transition:var(--trans);
+  font-weight:600;white-space:nowrap;border-radius:var(--r-sm);
+  font-family:'Instrument Sans',sans-serif;
+}
+.btn:disabled{opacity:.45;cursor:not-allowed;transform:none!important}
+.btn-sm{font-size:.72rem;padding:6px 12px}
+.btn-md{font-size:.8rem;padding:9px 16px}
+.btn-lg{font-size:.88rem;padding:12px 20px;border-radius:var(--r)}
+.btn-full{width:100%}
+.btn-pill{border-radius:100px!important}
+
+.btn-gold{background:var(--gold);color:#0a0f14}
+.btn-gold:hover:not(:disabled){background:#e0a83e;transform:translateY(-1px)}
+.btn-ghost{background:transparent;color:var(--ink2);border:1px solid var(--border2)}
+.btn-ghost:hover:not(:disabled){background:var(--card);border-color:var(--border2);color:var(--ink)}
+.btn-teal{background:var(--teal);color:#0a0f14}
+.btn-teal:hover:not(:disabled){background:#33d4b4;transform:translateY(-1px)}
+.btn-surface{background:var(--surface);color:var(--ink);border:1px solid var(--border)}
+.btn-surface:hover:not(:disabled){background:var(--card);border-color:var(--border2)}
+.btn-danger{background:var(--red-dim);color:var(--red);border:1px solid rgba(224,82,82,.2)}
+.btn-danger:hover:not(:disabled){background:rgba(224,82,82,.2)}
+
+/* ─── INPUTS ─────────────────────────────────────────────────── */
+.field{margin-bottom:14px}
+.field-label{
+  display:block;font-size:.72rem;font-weight:600;
+  color:var(--ink3);letter-spacing:.06em;text-transform:uppercase;
+  margin-bottom:6px;
+}
+.field-input{
+  width:100%;background:var(--surface);
+  border:1px solid var(--border);border-radius:var(--r-sm);
+  padding:11px 14px;color:var(--ink);font-size:.88rem;
+  outline:none;transition:var(--trans);
+}
+.field-input:focus{border-color:var(--gold);box-shadow:0 0 0 3px var(--gold-glow)}
+.field-input::placeholder{color:var(--ink3)}
+.field-input.otp-style{
+  text-align:center;font-size:1.5rem;letter-spacing:.3em;
+  font-family:'DM Serif Display',serif;
+}
+.field-hint{font-size:.72rem;color:var(--ink3);margin-top:5px}
+
+/* ─── ALERTS / FEEDBACK ──────────────────────────────────────── */
+.alert{
+  padding:10px 14px;border-radius:var(--r-sm);
+  font-size:.8rem;line-height:1.5;margin-bottom:12px;display:none;
+}
+.alert.show{display:block}
+.alert-error{background:var(--red-dim);border:1px solid rgba(224,82,82,.25);color:var(--red)}
+.alert-success{background:var(--green-dim);border:1px solid rgba(58,191,122,.25);color:var(--green)}
+.alert-info{background:var(--teal-dim);border:1px solid rgba(43,191,160,.2);color:var(--teal)}
+
+/* ─── VIEWS ──────────────────────────────────────────────────── */
+.view{display:none;animation:fadeSlide .25s ease both}
 .view.active{display:block}
+@keyframes fadeSlide{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
 
-/* ══════════════════════════════════ CUSTOMER VIEW ════════════════════════ */
-.loc-bar{max-width:680px;margin:0 auto;padding:0 20px}
-.loc-pill{
-  display:inline-flex;align-items:center;gap:6px;
-  background:var(--card);border:1.5px solid var(--border);
-  border-radius:100px;padding:6px 14px;font-size:.8rem;color:var(--muted);
-  margin-top:-16px;box-shadow:var(--shadow);position:relative;z-index:2;
+/* ─── HOME / HERO ────────────────────────────────────────────── */
+.hero{
+  padding:32px 16px 24px;
+  background:linear-gradient(160deg,#0a0f14 60%,#0d1a24 100%);
+  border-bottom:1px solid var(--border);
+  position:relative;overflow:hidden;
 }
-.loc-pill svg{color:var(--accent);flex-shrink:0}
+.hero::before{
+  content:'';position:absolute;top:-80px;right:-60px;
+  width:260px;height:260px;
+  background:radial-gradient(circle,var(--gold-glow) 0%,transparent 65%);
+  pointer-events:none;
+}
+.hero-inner{max-width:680px;margin:0 auto}
+.hero-eyebrow{
+  font-size:.7rem;font-weight:600;letter-spacing:.14em;
+  text-transform:uppercase;color:var(--gold);
+  display:flex;align-items:center;gap:8px;margin-bottom:10px;
+}
+.hero-eyebrow::before{content:'';width:20px;height:1px;background:var(--gold)}
+.hero-title{font-size:clamp(1.6rem,6vw,2.4rem);color:var(--ink);margin-bottom:6px}
+.hero-sub{font-size:.88rem;color:var(--ink2);line-height:1.6}
+.hero-location{
+  display:inline-flex;align-items:center;gap:7px;
+  margin-top:14px;font-size:.76rem;color:var(--ink3);
+}
+.pulse-dot{
+  width:7px;height:7px;background:var(--green);
+  border-radius:50%;position:relative;flex-shrink:0;
+}
+.pulse-dot::after{
+  content:'';position:absolute;inset:-3px;
+  background:var(--green);border-radius:50%;
+  animation:pulse 2.2s ease-out infinite;opacity:.4;
+}
+@keyframes pulse{0%{transform:scale(1);opacity:.4}100%{transform:scale(2.4);opacity:0}}
 
-.sec-label{
-  max-width:680px;margin:24px auto 12px;padding:0 20px;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.68rem;
-  letter-spacing:.15em;text-transform:uppercase;color:var(--muted);
+/* ─── CATEGORY TABS ──────────────────────────────────────────── */
+.cat-wrap{padding:16px 0 4px;border-bottom:1px solid var(--border);background:var(--bg)}
+.cat-scroll{
+  display:flex;gap:6px;overflow-x:auto;padding:0 16px 12px;
+  scrollbar-width:none;-webkit-overflow-scrolling:touch;
+}
+.cat-scroll::-webkit-scrollbar{display:none}
+.cat-pill{
+  display:flex;align-items:center;gap:6px;
+  padding:7px 14px;border-radius:100px;
+  border:1px solid var(--border);background:transparent;
+  color:var(--ink2);font-size:.76rem;font-weight:600;
+  cursor:pointer;transition:var(--trans);white-space:nowrap;flex-shrink:0;
+}
+.cat-pill .cat-icon{font-size:.95rem}
+.cat-pill:hover{border-color:var(--border2);color:var(--ink);background:var(--card)}
+.cat-pill.active{
+  background:var(--gold-dim);border-color:var(--gold);
+  color:var(--gold);
+  box-shadow:0 0 0 1px var(--gold);
 }
 
-.cats-wrap{max-width:680px;margin:0 auto;padding:0 20px}
-.cats{display:flex;gap:8px;overflow-x:auto;padding-bottom:4px;scrollbar-width:none}
-.cats::-webkit-scrollbar{display:none}
-.cat-btn{
-  display:flex;flex-direction:column;align-items:center;gap:5px;
-  flex-shrink:0;background:var(--card);border:1.5px solid var(--border);
-  border-radius:var(--radius);padding:12px 14px 10px;min-width:74px;
-  cursor:pointer;transition:var(--trans);
-  font-family:'DM Sans',sans-serif;font-size:.7rem;font-weight:500;color:var(--muted);
+/* ─── SECTION HEADER ─────────────────────────────────────────── */
+.section-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:18px 16px 10px;max-width:680px;margin:0 auto;
 }
-.cat-btn .emo{font-size:1.3rem;line-height:1}
-.cat-btn:hover{border-color:var(--accent2);color:var(--accent2);transform:translateY(-2px)}
-.cat-btn.active{
-  background:var(--accent2);border-color:var(--accent2);color:#fff;
-  box-shadow:0 6px 20px rgba(26,60,94,.32);transform:translateY(-2px);
+.section-title{font-size:1rem;font-weight:700;color:var(--ink)}
+.section-count{font-size:.72rem;color:var(--ink3);font-weight:500}
+.filter-row{
+  display:flex;align-items:center;gap:8px;
+  padding:0 16px 10px;max-width:680px;margin:0 auto;
 }
+.filter-toggle{
+  display:flex;align-items:center;gap:6px;
+  font-size:.74rem;color:var(--ink2);cursor:pointer;user-select:none;
+}
+.filter-toggle input[type=checkbox]{accent-color:var(--gold);cursor:pointer}
 
-.res-hdr{
-  max-width:680px;margin:22px auto 12px;padding:0 20px;
-  display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:8px;
+/* ─── WORKER CARDS ───────────────────────────────────────────── */
+.card-list{
+  display:flex;flex-direction:column;gap:10px;
+  padding:0 16px;max-width:680px;margin:0 auto;padding-bottom:20px;
 }
-.res-title{font-family:'Syne',sans-serif;font-size:1.1rem;font-weight:700}
-.res-meta{display:flex;align-items:center;gap:10px}
-.res-count{font-size:.77rem;color:var(--muted)}
-.avail-toggle{
-  display:flex;align-items:center;gap:5px;
-  font-size:.74rem;color:var(--muted);cursor:pointer;user-select:none;
-}
-.avail-toggle input{accent-color:var(--accent2)}
-
-/* ── cards ── */
-#cards{max-width:680px;margin:0 auto;padding:0 20px;display:flex;flex-direction:column;gap:12px}
-.w-card{
-  background:var(--card);border:1.5px solid var(--border);
-  border-radius:var(--radius);padding:16px 18px;
+.worker-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:16px;
   display:flex;align-items:center;gap:14px;
-  box-shadow:var(--shadow);
-  animation:slideUp .3s both;transition:var(--trans);
+  transition:var(--trans);cursor:default;
+  animation:fadeSlide .3s ease both;
 }
-.w-card:hover{transform:translateY(-2px);box-shadow:0 10px 30px rgba(0,0,0,.1)}
-.w-card.busy{opacity:.62}
-@keyframes slideUp{from{opacity:0;transform:translateY(14px)}to{opacity:1;transform:translateY(0)}}
-
-.ava{
-  width:50px;height:50px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
+.worker-card:hover{background:var(--card-hov);border-color:var(--border2);box-shadow:var(--shadow-sm)}
+.worker-avatar{
+  width:50px;height:50px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#1a3a4a 0%,#0f2030 100%);
   display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.95rem;color:#fff;
-  flex-shrink:0;position:relative;
+  font-family:'DM Serif Display',serif;font-size:1.1rem;
+  color:var(--gold);border:1px solid var(--border2);
+  position:relative;
 }
-.sdot{
-  position:absolute;bottom:0;right:0;
-  width:12px;height:12px;border-radius:50%;border:2px solid var(--card);
+.status-ring{
+  position:absolute;bottom:1px;right:1px;
+  width:12px;height:12px;border-radius:50%;
+  border:2px solid var(--card);
 }
-.sdot.available{background:var(--green)}
-.sdot.on_job{background:var(--orange)}
-.sdot.unavailable{background:var(--slate)}
+.status-ring.available{background:var(--green)}
+.status-ring.on_job{background:var(--amber)}
+.status-ring.unavailable{background:var(--ink3)}
+.worker-info{flex:1;min-width:0}
+.worker-name{font-weight:700;font-size:.9rem;color:var(--ink);margin-bottom:4px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.worker-meta{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.stars-row{display:flex;align-items:center;gap:2px}
+.star{font-size:.65rem;color:var(--ink3)}
+.star.filled{color:var(--gold)}
+.rating-num{font-size:.72rem;font-weight:600;color:var(--ink2);margin-left:3px}
+.dist-tag{font-size:.68rem;color:var(--ink3);display:flex;align-items:center;gap:3px}
+.status-badge{
+  font-size:.62rem;font-weight:700;letter-spacing:.04em;
+  padding:2px 8px;border-radius:100px;text-transform:uppercase;
+}
+.status-badge.available{background:var(--green-dim);color:var(--green)}
+.status-badge.on_job{background:var(--amber-dim);color:var(--amber)}
+.status-badge.unavailable{background:rgba(86,106,126,.1);color:var(--ink3)}
+.next-slot{font-size:.66rem;color:var(--teal);margin-top:4px;display:flex;align-items:center;gap:4px}
+.worker-actions{display:flex;flex-direction:column;gap:6px;flex-shrink:0;align-items:flex-end}
 
-.w-info{flex:1;min-width:0}
-.w-name{
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.93rem;
-  white-space:nowrap;overflow:hidden;text-overflow:ellipsis;
+/* ─── MY BOOKINGS STRIP ──────────────────────────────────────── */
+.bookings-strip{
+  padding:0 16px 20px;max-width:680px;margin:0 auto;
+  display:none;
 }
-.w-meta{display:flex;align-items:center;gap:7px;margin-top:4px;flex-wrap:wrap}
-.stars{display:flex;align-items:center;gap:1px;font-size:.67rem}
-.star{color:var(--star)}.star.e{color:#ddd}
-.rnum{font-size:.74rem;font-weight:500;margin-left:2px;color:var(--ink)}
-.dist-b{
-  font-size:.68rem;color:var(--muted);background:var(--bg);
-  padding:2px 7px;border-radius:100px;
-  display:inline-flex;align-items:center;gap:3px;
+.bookings-strip.show{display:block}
+.booking-item{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r);padding:13px 15px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:12px;margin-bottom:8px;
 }
-.st-b{font-size:.65rem;font-weight:600;padding:2px 7px;border-radius:100px}
-.st-b.available{background:#dcfce7;color:#15803d}
-.st-b.on_job{background:#fef3c7;color:#b45309}
-.st-b.unavailable{background:#f1f5f9;color:var(--slate)}
-.next-slot{font-size:.64rem;color:var(--muted);margin-top:3px}
+.booking-detail{flex:1;min-width:0}
+.booking-title{font-weight:600;font-size:.85rem;color:var(--ink)}
+.booking-sub{font-size:.72rem;color:var(--ink2);margin-top:3px}
 
-.card-acts{display:flex;flex-direction:column;gap:6px;align-items:flex-end;flex-shrink:0}
-.call-btn{
+/* ─── STATUS BADGE extended ──────────────────────────────────── */
+.bk-status{
+  font-size:.62rem;font-weight:700;padding:3px 9px;
+  border-radius:100px;text-transform:uppercase;letter-spacing:.04em;white-space:nowrap;
+}
+.bk-status.pending{background:var(--amber-dim);color:var(--amber)}
+.bk-status.confirmed{background:var(--green-dim);color:var(--green)}
+.bk-status.cancelled{background:var(--red-dim);color:var(--red)}
+.bk-status.completed{background:var(--teal-dim);color:var(--teal)}
+.bk-status.in_progress{background:var(--gold-dim);color:var(--gold)}
+
+/* ─── EMPTY STATE ────────────────────────────────────────────── */
+.empty-state{
+  padding:48px 20px;text-align:center;
+  display:flex;flex-direction:column;align-items:center;gap:10px;
+}
+.empty-icon{font-size:2.2rem;opacity:.4}
+.empty-title{font-size:.9rem;font-weight:600;color:var(--ink2)}
+.empty-sub{font-size:.78rem;color:var(--ink3);line-height:1.5;max-width:240px}
+
+/* ─── DASHBOARD ──────────────────────────────────────────────── */
+.dash-header{
+  background:linear-gradient(160deg,#0d1a24,#111820);
+  border-bottom:1px solid var(--border);padding:20px 16px 16px;
+}
+.dash-header-inner{max-width:680px;margin:0 auto}
+.dash-greeting{font-size:.72rem;color:var(--ink3);font-weight:600;letter-spacing:.1em;text-transform:uppercase;margin-bottom:4px}
+.dash-name{font-size:1.5rem;color:var(--ink);margin-bottom:2px}
+.dash-role-tag{
   display:inline-flex;align-items:center;gap:5px;
-  background:var(--accent2);color:#fff;border:none;
-  border-radius:100px;padding:8px 14px;font-size:.75rem;font-weight:600;
-  cursor:pointer;text-decoration:none;transition:var(--trans);
-  font-family:'DM Sans',sans-serif;
+  font-size:.68rem;font-weight:600;letter-spacing:.08em;text-transform:uppercase;
+  padding:3px 10px;border-radius:100px;margin-top:4px;
 }
-.call-btn:hover{background:#0f2a45}
-.call-btn.off{background:#cbd5e1;cursor:not-allowed}
-.book-btn{
-  display:inline-flex;align-items:center;gap:5px;
-  background:var(--accent);color:#fff;border:none;
-  border-radius:100px;padding:8px 14px;font-size:.75rem;font-weight:600;
-  cursor:pointer;transition:var(--trans);font-family:'DM Sans',sans-serif;
+.dash-role-tag.worker{background:var(--gold-dim);color:var(--gold);border:1px solid rgba(212,153,58,.25)}
+.dash-role-tag.assistant{background:var(--teal-dim);color:var(--teal);border:1px solid rgba(43,191,160,.2)}
+.dash-role-tag.customer{background:var(--green-dim);color:var(--green);border:1px solid rgba(58,191,122,.2)}
+
+.dash-body{padding:16px;max-width:680px;margin:0 auto;display:flex;flex-direction:column;gap:12px}
+.dash-card{
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:18px 18px;
 }
-.book-btn:hover{background:#c93508}
+.dash-card-title{
+  font-size:.68rem;font-weight:700;letter-spacing:.1em;text-transform:uppercase;
+  color:var(--ink3);margin-bottom:14px;display:flex;align-items:center;gap:7px;
+}
+.dash-card-title::before{content:'';width:3px;height:12px;background:var(--gold);border-radius:2px}
 
-/* ── My Bookings (customer) ── */
-#my-bk-section{max-width:680px;margin:28px auto 0;padding:0 20px;display:none}
-#my-bk-section.show{display:block}
-.bk-hdr{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem;margin-bottom:12px}
+/* ─── STATUS SELECTOR ────────────────────────────────────────── */
+.status-selector{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
+.status-opt{
+  border:1px solid var(--border);border-radius:var(--r);
+  padding:12px 8px;cursor:pointer;transition:var(--trans);
+  text-align:center;background:transparent;
+}
+.status-opt:hover{border-color:var(--border2);background:var(--surface)}
+.status-opt.active-available{border-color:var(--green);background:var(--green-dim)}
+.status-opt.active-on_job{border-color:var(--amber);background:var(--amber-dim)}
+.status-opt.active-unavailable{border-color:var(--ink3);background:rgba(86,106,126,.08)}
+.status-opt-icon{font-size:1.2rem;margin-bottom:5px}
+.status-opt-label{font-size:.68rem;font-weight:700;letter-spacing:.03em}
+.status-opt-label.available{color:var(--green)}
+.status-opt-label.on_job{color:var(--amber)}
+.status-opt-label.unavailable{color:var(--ink3)}
 
-/* ══════════════════════════════════ STATE BOX ════════════════════════════ */
-.sbox{padding:34px 20px;text-align:center}
-.sbox .ico{font-size:2.8rem;margin-bottom:10px}
-.sbox .msg{color:var(--muted);font-size:.86rem;line-height:1.5}
-.spin{
-  width:30px;height:30px;border:3px solid var(--border);
-  border-top-color:var(--accent2);border-radius:50%;
-  animation:spin .7s linear infinite;margin:0 auto 12px;
+/* ─── SLOTS ──────────────────────────────────────────────────── */
+.slot-list{display:flex;flex-direction:column;gap:7px;margin-bottom:14px}
+.slot-item{
+  display:flex;align-items:center;justify-content:space-between;
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:9px 12px;gap:10px;
+}
+.slot-info{flex:1;min-width:0}
+.slot-date{font-size:.72rem;font-weight:600;color:var(--gold)}
+.slot-time{font-size:.82rem;font-weight:700;color:var(--ink);margin-top:2px}
+.slot-booked-badge{font-size:.62rem;padding:2px 7px;border-radius:100px;background:var(--amber-dim);color:var(--amber);border:1px solid rgba(224,150,58,.2)}
+.add-slot-form{
+  display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;
+  margin-bottom:8px;
+}
+.add-slot-form .field-input{margin:0;font-size:.8rem;padding:9px 10px}
+
+/* ─── BOOKING LIST (dash) ────────────────────────────────────── */
+.dash-booking-item{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-sm);padding:11px 13px;
+  display:flex;align-items:center;justify-content:space-between;
+  gap:10px;margin-bottom:7px;
+}
+.dash-booking-item:last-child{margin-bottom:0}
+
+/* ─── LINKED WORKER ──────────────────────────────────────────── */
+.linked-worker-card{
+  background:var(--surface);border:1px solid var(--border2);
+  border-radius:var(--r);padding:14px;
+  display:flex;align-items:center;gap:14px;
+}
+.linked-worker-avatar{
+  width:46px;height:46px;border-radius:50%;flex-shrink:0;
+  background:linear-gradient(135deg,#1a3a4a 0%,#0f2030 100%);
+  display:flex;align-items:center;justify-content:center;
+  font-family:'DM Serif Display',serif;font-size:1rem;
+  color:var(--teal);border:1px solid var(--border2);
+}
+.linked-worker-info .lw-name{font-weight:700;font-size:.88rem;color:var(--ink)}
+.linked-worker-info .lw-cat{font-size:.74rem;color:var(--ink2);margin-top:2px;text-transform:capitalize}
+.linked-worker-info .lw-rating{font-size:.7rem;color:var(--ink3);margin-top:4px}
+
+/* ─── MODAL ──────────────────────────────────────────────────── */
+.modal-backdrop{
+  position:fixed;inset:0;background:rgba(0,0,0,.72);
+  z-index:200;display:none;align-items:flex-end;justify-content:center;
+  backdrop-filter:blur(4px);padding-bottom:env(safe-area-inset-bottom);
+}
+.modal-backdrop.open{display:flex;animation:bkdIn .18s ease}
+@keyframes bkdIn{from{opacity:0}to{opacity:1}}
+.modal-sheet{
+  background:var(--surface);border:1px solid var(--border);
+  border-radius:var(--r-lg) var(--r-lg) 0 0;
+  width:100%;max-width:520px;
+  max-height:90vh;overflow-y:auto;
+  padding:8px 20px 32px;
+  animation:sheetUp .22s cubic-bezier(.4,0,.2,1);
+}
+@keyframes sheetUp{from{transform:translateY(40px);opacity:0}to{transform:translateY(0);opacity:1}}
+@media(min-width:540px){
+  .modal-backdrop{align-items:center;padding:20px}
+  .modal-sheet{border-radius:var(--r-lg);max-height:85vh}
+  @keyframes sheetUp{from{transform:scale(.96) translateY(8px);opacity:0}to{transform:scale(1) translateY(0);opacity:1}}
+}
+.modal-handle{width:36px;height:3px;background:var(--border2);border-radius:2px;margin:8px auto 20px}
+.modal-title{font-size:1.2rem;color:var(--ink);margin-bottom:5px}
+.modal-sub{font-size:.8rem;color:var(--ink2);line-height:1.5;margin-bottom:20px}
+.modal-close-btn{
+  float:right;margin-top:-4px;
+  background:var(--card);border:1px solid var(--border);
+  color:var(--ink2);width:28px;height:28px;border-radius:50%;
+  display:flex;align-items:center;justify-content:center;
+  font-size:.8rem;cursor:pointer;transition:var(--trans);
+}
+.modal-close-btn:hover{background:var(--card-hov);color:var(--ink)}
+
+/* ─── SLOT CHIPS (booking) ───────────────────────────────────── */
+.slot-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;min-height:38px}
+.slot-chip{
+  padding:6px 13px;border:1px solid var(--border2);border-radius:100px;
+  font-size:.76rem;font-weight:600;cursor:pointer;transition:var(--trans);
+  color:var(--ink2);background:var(--card);
+}
+.slot-chip:hover:not(.booked){border-color:var(--teal);color:var(--teal);background:var(--teal-dim)}
+.slot-chip.selected{background:var(--teal);border-color:var(--teal);color:#0a0f14}
+.slot-chip.booked{opacity:.4;cursor:not-allowed;text-decoration:line-through}
+.no-slots-msg{font-size:.78rem;color:var(--ink3);padding:8px 0;font-style:italic}
+
+/* ─── LOGIN VIEW ─────────────────────────────────────────────── */
+.login-view{
+  min-height:calc(100vh - 56px);
+  display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:32px 24px;
+}
+.login-card{
+  width:100%;max-width:380px;
+  background:var(--card);border:1px solid var(--border);
+  border-radius:var(--r-lg);padding:28px 24px;
+}
+.login-logo{
+  font-family:'DM Serif Display',serif;font-size:1.8rem;
+  color:var(--ink);margin-bottom:4px;
+  display:flex;align-items:center;gap:4px;
+}
+.login-tagline{font-size:.78rem;color:var(--ink3);margin-bottom:24px;line-height:1.5}
+.otp-step{display:none}
+.otp-step.active{display:block}
+.otp-sent-note{
+  background:var(--green-dim);border:1px solid rgba(58,191,122,.2);
+  border-radius:var(--r-sm);padding:10px 13px;font-size:.78rem;
+  color:var(--green);margin-bottom:14px;
+}
+
+/* ─── BOTTOM NAV ─────────────────────────────────────────────── */
+#bottom-nav{
+  position:fixed;bottom:0;left:0;right:0;z-index:90;
+  background:rgba(10,15,20,.92);backdrop-filter:blur(20px);
+  border-top:1px solid var(--border);
+  display:flex;padding-bottom:env(safe-area-inset-bottom);
+}
+.nav-item{
+  flex:1;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;padding:10px 4px 8px;
+  cursor:pointer;transition:var(--trans);
+  color:var(--ink3);font-size:.58rem;font-weight:600;
+  letter-spacing:.05em;text-transform:uppercase;gap:4px;
+  border:none;background:transparent;
+}
+.nav-item svg{width:18px;height:18px;stroke-width:1.7}
+.nav-item:hover{color:var(--ink2)}
+.nav-item.active{color:var(--gold)}
+.nav-item.hidden{display:none}
+
+/* ─── TOAST ──────────────────────────────────────────────────── */
+#toast-container{
+  position:fixed;top:70px;left:50%;transform:translateX(-50%);
+  z-index:300;display:flex;flex-direction:column;align-items:center;gap:6px;
+  pointer-events:none;width:calc(100% - 32px);max-width:380px;
+}
+.toast{
+  background:var(--card);border:1px solid var(--border2);
+  border-radius:100px;padding:9px 18px;
+  font-size:.78rem;font-weight:600;color:var(--ink);
+  box-shadow:var(--shadow-sm);
+  animation:toastIn .2s ease;display:flex;align-items:center;gap:7px;
+}
+@keyframes toastIn{from{opacity:0;transform:translateY(-8px)}to{opacity:1;transform:translateY(0)}}
+.toast.error{border-color:rgba(224,82,82,.3);background:rgba(30,10,10,.95)}
+.toast.success{border-color:rgba(58,191,122,.3);background:rgba(10,28,20,.95)}
+
+/* ─── LOADING SPINNER ────────────────────────────────────────── */
+.spinner-wrap{padding:40px;display:flex;justify-content:center;align-items:center}
+.spinner{
+  width:28px;height:28px;border:2px solid var(--border2);
+  border-top-color:var(--gold);border-radius:50%;
+  animation:spin .7s linear infinite;
 }
 @keyframes spin{to{transform:rotate(360deg)}}
 
-/* ══════════════════════════════════ DASHBOARDS ═══════════════════════════ */
-.dash-hdr{background:var(--accent2);color:#fff;padding:16px 20px 14px}
-.dash-hdr-inner{max-width:680px;margin:0 auto;display:flex;align-items:center;gap:12px}
-.back-btn{
-  background:rgba(255,255,255,.12);border:1.5px solid rgba(255,255,255,.22);
-  color:#fff;padding:6px 12px;border-radius:100px;
-  font-size:.74rem;font-weight:600;cursor:pointer;transition:var(--trans);
-  font-family:'DM Sans',sans-serif;flex-shrink:0;
-}
-.back-btn:hover{background:rgba(255,255,255,.22)}
-.dash-ttl{font-family:'Syne',sans-serif;font-weight:800;font-size:1.15rem}
-.dash-sub{font-size:.74rem;color:rgba(255,255,255,.55);margin-top:2px}
+/* ─── ASSISTANT PHONE INPUT ──────────────────────────────────── */
+.inline-form{display:flex;gap:8px}
+.inline-form .field-input{flex:1}
 
-.dash-body{max-width:680px;margin:20px auto;padding:0 20px;display:flex;flex-direction:column;gap:15px}
-
-.d-card{background:var(--card);border:1.5px solid var(--border);border-radius:var(--radius);padding:18px 20px;box-shadow:var(--shadow)}
-.d-ttl{
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.74rem;
-  letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:14px;display:flex;align-items:center;gap:6px;
-}
-
-/* ── Profile ── */
-.prof-row{display:flex;align-items:center;gap:14px}
-.prof-ava{
-  width:56px;height:56px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:1.2rem;color:#fff;flex-shrink:0;
-}
-.pname{font-family:'Syne',sans-serif;font-weight:700;font-size:1rem}
-.pcat{font-size:.79rem;color:var(--muted);text-transform:capitalize;margin-top:2px}
-.prating{color:var(--star);font-size:.76rem;margin-top:3px}
-
-/* ── Status opts ── */
-.st-opts{display:grid;grid-template-columns:repeat(3,1fr);gap:8px}
-.st-opt{
-  border:2px solid var(--border);border-radius:10px;
-  padding:10px 6px;cursor:pointer;transition:var(--trans);
-  text-align:center;background:var(--bg);
-}
-.st-opt:hover{border-color:var(--accent2)}
-.st-opt.sel-available{border-color:var(--green);background:#f0fdf4}
-.st-opt.sel-on_job{border-color:var(--orange);background:#fffbeb}
-.st-opt.sel-unavailable{border-color:var(--slate);background:#f8fafc}
-.st-opt .se{font-size:1.3rem;margin-bottom:4px}
-.st-opt .sl{font-size:.71rem;font-weight:700;font-family:'Syne',sans-serif}
-.st-opt .sd{font-size:.63rem;color:var(--muted);margin-top:2px}
-
-/* ── Slots ── */
-.slots-list{display:flex;flex-direction:column;gap:8px;margin-bottom:13px}
-.slot-row{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--bg);border-radius:8px;padding:8px 12px;font-size:.79rem;
-}
-.slot-tag{
-  background:var(--accent2);color:#fff;
-  border-radius:100px;padding:2px 9px;font-size:.64rem;font-weight:600;margin-right:6px;
-}
-.slot-del{
-  background:none;border:none;color:var(--muted);cursor:pointer;
-  font-size:.8rem;padding:2px 6px;border-radius:4px;transition:var(--trans);
-}
-.slot-del:hover{background:#fee2e2;color:#b91c1c}
-.slot-form{display:grid;grid-template-columns:1fr 1fr 1fr;gap:7px;margin-bottom:9px}
-.f-in{
-  background:var(--bg);border:1.5px solid var(--border);
-  border-radius:8px;padding:8px 10px;font-size:.79rem;
-  font-family:'DM Sans',sans-serif;color:var(--ink);outline:none;transition:var(--trans);width:100%;
-}
-.f-in:focus{border-color:var(--accent2);background:#fff}
-.slot-add-btn{
-  background:var(--accent);color:#fff;border:none;
-  border-radius:8px;padding:8px 12px;font-size:.78rem;font-weight:600;
-  cursor:pointer;transition:var(--trans);font-family:'DM Sans',sans-serif;white-space:nowrap;width:100%;
-  grid-column:1/-1;
-}
-.slot-add-btn:hover{background:#c93508}
-
-/* ── Bookings list (worker) ── */
-.bk-row{
-  display:flex;align-items:center;justify-content:space-between;
-  background:var(--bg);border-radius:8px;padding:10px 12px;gap:8px;font-size:.79rem;
-}
-.bk-row+.bk-row{margin-top:7px}
-.bk-info{flex:1;min-width:0}
-.bk-who{font-weight:600;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
-.bk-date{font-size:.7rem;color:var(--muted);margin-top:2px}
-.bk-st{font-size:.66rem;font-weight:600;padding:2px 8px;border-radius:100px;white-space:nowrap}
-.bk-st.pending{background:#fef3c7;color:#b45309}
-.bk-st.confirmed{background:#dcfce7;color:#15803d}
-.bk-st.cancelled{background:#fee2e2;color:#b91c1c}
-.bk-st.completed{background:#dbeafe;color:#1d4ed8}
-.bk-st.in_progress{background:#f0fdf4;color:var(--green)}
-
-/* ── Assistant input ── */
-.asst-form{display:flex;gap:8px;margin-top:4px}
-.asst-form .f-in{flex:1}
-.asst-form button{
-  background:var(--accent2);color:#fff;border:none;
-  border-radius:8px;padding:9px 14px;font-size:.78rem;font-weight:600;
-  cursor:pointer;transition:var(--trans);font-family:'DM Sans',sans-serif;white-space:nowrap;
-}
-.asst-form button:hover{background:#0f2a45}
-
-/* ── Save / action btn ── */
-.btn-save{
-  width:100%;background:var(--green);color:#fff;border:none;
-  border-radius:100px;padding:13px;font-size:.88rem;font-weight:600;
-  font-family:'DM Sans',sans-serif;cursor:pointer;transition:var(--trans);
-}
-.btn-save:hover{background:#15803d}
-.save-ok{
-  background:#dcfce7;border:1.5px solid #86efac;
-  border-radius:10px;padding:10px 14px;font-size:.8rem;color:#15803d;
-  font-weight:500;display:none;align-items:center;gap:7px;margin-bottom:4px;
-}
-.save-ok.show{display:flex}
-
-/* ── Assistant dash ── */
-.lw-box{display:flex;align-items:center;gap:12px;background:var(--bg);border-radius:10px;padding:12px 14px}
-.lw-ava{
-  width:44px;height:44px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.9rem;color:#fff;flex-shrink:0;
-}
-.lw-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem}
-.lw-cat{font-size:.73rem;color:var(--muted);text-transform:capitalize;margin-top:2px}
-
-/* ══════════════════════════════════ MODALS ═══════════════════════════════ */
-.m-ov{
-  position:fixed;inset:0;background:rgba(13,13,13,.55);
-  backdrop-filter:blur(5px);z-index:200;
-  display:none;align-items:center;justify-content:center;padding:16px;
-}
-.m-ov.open{display:flex}
-.modal{
-  background:var(--card);border-radius:20px;padding:26px 22px;
-  max-width:420px;width:100%;
-  box-shadow:0 24px 80px rgba(0,0,0,.22);
-  position:relative;animation:mIn .28s cubic-bezier(.4,0,.2,1);
-  max-height:92vh;overflow-y:auto;
-}
-@keyframes mIn{from{opacity:0;transform:scale(.96) translateY(10px)}to{opacity:1;scale(1) translateY(0)}}
-.m-x{
-  position:absolute;top:12px;right:12px;
-  background:var(--bg);border:none;border-radius:50%;
-  width:28px;height:28px;font-size:.85rem;cursor:pointer;
-  color:var(--muted);display:flex;align-items:center;justify-content:center;transition:var(--trans);
-}
-.m-x:hover{background:var(--border);color:var(--ink)}
-.m-ttl{font-family:'Syne',sans-serif;font-weight:800;font-size:1.2rem;margin-bottom:4px}
-.m-sub{font-size:.79rem;color:var(--muted);margin-bottom:18px;line-height:1.5}
-
-.f-label{
-  font-size:.7rem;font-weight:700;font-family:'Syne',sans-serif;
-  letter-spacing:.07em;text-transform:uppercase;color:var(--muted);
-  margin-bottom:5px;display:block;
-}
-.f-input{
-  width:100%;background:var(--bg);border:1.5px solid var(--border);
-  border-radius:10px;padding:10px 13px;font-size:.87rem;
-  font-family:'DM Sans',sans-serif;color:var(--ink);
-  transition:var(--trans);outline:none;margin-bottom:13px;
-}
-.f-input:focus{border-color:var(--accent2);background:#fff}
-.f-err{
-  background:#fee2e2;color:#b91c1c;border-radius:8px;
-  padding:9px 12px;font-size:.78rem;margin-bottom:12px;display:none;
-}
-.f-err.show{display:block}
-.f-note{font-size:.74rem;color:var(--muted);margin-bottom:13px}
-.btn-prim{
-  width:100%;background:var(--accent2);color:#fff;border:none;
-  border-radius:100px;padding:12px;font-size:.87rem;font-weight:600;
-  font-family:'DM Sans',sans-serif;cursor:pointer;transition:var(--trans);margin-top:2px;
-}
-.btn-prim:hover{background:#0f2a45;transform:translateY(-1px)}
-.btn-prim:disabled{background:#cbd5e1;cursor:not-allowed;transform:none}
-
-.step{display:none}.step.active{display:block}
-.otp-sent-note{
-  background:#dbeafe;color:#1d4ed8;border-radius:8px;
-  padding:9px 12px;font-size:.78rem;margin-bottom:13px;display:none;
-}
-.otp-sent-note.show{display:block}
-
-/* ── Booking modal ── */
-.bm-worker{
-  display:flex;align-items:center;gap:12px;
-  background:var(--bg);border-radius:10px;padding:11px 13px;margin-bottom:16px;
-}
-.bm-ava{
-  width:40px;height:40px;border-radius:50%;
-  background:linear-gradient(135deg,var(--accent2),#2e5f8a);
-  display:flex;align-items:center;justify-content:center;
-  font-family:'Syne',sans-serif;font-weight:700;font-size:.85rem;color:#fff;flex-shrink:0;
-}
-.bm-name{font-family:'Syne',sans-serif;font-weight:700;font-size:.88rem}
-.bm-cat{font-size:.73rem;color:var(--muted);text-transform:capitalize;margin-top:2px}
-
-.slot-chips{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:14px;min-height:34px}
-.slot-chip{
-  border:1.5px solid var(--border);border-radius:100px;
-  padding:5px 12px;font-size:.74rem;cursor:pointer;
-  transition:var(--trans);background:var(--bg);
-}
-.slot-chip:hover{border-color:var(--accent2)}
-.slot-chip.sel{background:var(--accent2);border-color:var(--accent2);color:#fff}
-.slot-chip.taken{opacity:.4;cursor:not-allowed;text-decoration:line-through}
-.no-slots-msg{font-size:.78rem;color:var(--muted);font-style:italic}
-
-/* ══════════════════════════════════ BOTTOM NAV ═══════════════════════════ */
-.bnav{
-  position:fixed;bottom:0;left:0;right:0;
-  background:var(--card);border-top:1.5px solid var(--border);
-  display:flex;z-index:100;
-  padding-bottom:env(safe-area-inset-bottom,0px);
-  box-shadow:0 -4px 20px rgba(0,0,0,.07);
-}
-.bn-item{
-  flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;
-  padding:10px 6px 8px;cursor:pointer;transition:var(--trans);
-  border:none;background:none;color:var(--muted);
-  font-family:'DM Sans',sans-serif;font-size:.63rem;font-weight:500;gap:3px;
-}
-.bn-item svg{width:19px;height:19px;stroke-width:1.8}
-.bn-item.active{color:var(--accent2)}
-.bn-item:hover{color:var(--accent2)}
-
-/* ══════════════════════════════════ TOAST ════════════════════════════════ */
-#toast{
-  position:fixed;bottom:82px;left:50%;
-  transform:translateX(-50%) translateY(60px);
-  background:var(--ink);color:#fff;
-  padding:9px 18px;border-radius:100px;
-  font-size:.79rem;font-weight:500;
-  opacity:0;transition:all .28s ease;
-  z-index:400;white-space:nowrap;pointer-events:none;
-}
-#toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
-
-/* ══════════════════════════════════ MOBILE ═══════════════════════════════ */
-@media(max-width:520px){
-  .modal{
-    border-radius:22px 22px 0 0;margin-top:auto;
-    max-height:90vh;padding:22px 18px;
-  }
-  .m-ov{align-items:flex-end;padding:0}
-  header{padding:12px 16px 11px}
-  .logo{font-size:1.5rem}
-  #cards,.dash-body,.res-hdr,.cats-wrap,.loc-bar,.sec-label,#my-bk-section{
-    padding-left:14px;padding-right:14px;
-  }
-  .w-card{padding:13px 15px;gap:11px}
-  .ava{width:44px;height:44px}
-  .slot-form{grid-template-columns:1fr 1fr}
-  .st-opts{grid-template-columns:repeat(3,1fr)}
-  .card-acts{gap:5px}
-  .call-btn,.book-btn{padding:7px 11px;font-size:.72rem}
-  .h-right{gap:5px}
-  .h-auth-btn{padding:6px 11px;font-size:.74rem}
+/* ─── RESPONSIVE ─────────────────────────────────────────────── */
+@media(max-width:400px){
+  .add-slot-form{grid-template-columns:1fr 1fr}
+  .status-selector{grid-template-columns:repeat(3,1fr)}
 }
 </style>
 </head>
 <body>
 
-<!-- ═══════════════════════════════ HEADER ════════════════════════════════ -->
-<header>
-  <div class="h-inner">
-    <div class="logo">Fixr<span class="logo-dot">.</span><span class="logo-v">v2</span></div>
-    <div class="h-right">
-      <button class="lang-btn" id="langBtn" onclick="toggleLang()">தமிழ்</button>
-      <button class="h-dash-btn" id="dashBtn" style="display:none" onclick="openDash()">Dashboard</button>
-      <button class="h-auth-btn" id="authBtn" onclick="handleAuthBtn()">Login</button>
+<!-- ══ HEADER ═══════════════════════════════════════════════════ -->
+<header id="header">
+  <div class="header-inner">
+    <div class="logo">
+      Fixr<span class="logo-dot">.</span>
+      <span class="logo-tag" id="header-role-tag" style="display:none"></span>
+    </div>
+    <div class="header-actions">
+      <button class="btn btn-sm btn-ghost btn-pill" id="lang-toggle-btn" onclick="toggleLang()">தமிழ்</button>
+      <button class="btn btn-sm btn-gold btn-pill" id="login-btn" onclick="showView('login')" data-i18n="header_login">Login</button>
+      <button class="btn btn-sm btn-ghost btn-pill" id="logout-btn" style="display:none" onclick="doLogout()" data-i18n="header_logout">Logout</button>
     </div>
   </div>
 </header>
 
-<!-- ═══════════════════════════════ CUSTOMER VIEW ════════════════════════ -->
-<section id="v-customer" class="view active">
-  <div class="loc-bar">
-    <div class="loc-pill">
-      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
-        <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
-      </svg>
-      <span id="locText">Madurai, Tamil Nadu</span>
-    </div>
-  </div>
+<!-- ══ TOAST ═════════════════════════════════════════════════════ -->
+<div id="toast-container"></div>
 
-  <p class="sec-label" id="whatNeedLabel">What do you need?</p>
-  <div class="cats-wrap">
-    <div class="cats" id="cats">
-      <button class="cat-btn active" data-service="electrician"><span class="emo">⚡</span><span data-i18n="cat_electrician">Electrician</span></button>
-      <button class="cat-btn" data-service="plumber"><span class="emo">🔧</span><span data-i18n="cat_plumber">Plumber</span></button>
-      <button class="cat-btn" data-service="carpenter"><span class="emo">🪚</span><span data-i18n="cat_carpenter">Carpenter</span></button>
-      <button class="cat-btn" data-service="painter"><span class="emo">🖌️</span><span data-i18n="cat_painter">Painter</span></button>
-      <button class="cat-btn" data-service="cleaner"><span class="emo">🧹</span><span data-i18n="cat_cleaner">Cleaner</span></button>
-      <button class="cat-btn" data-service="ac_technician"><span class="emo">❄️</span><span data-i18n="cat_ac_technician">AC Tech</span></button>
-    </div>
-  </div>
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW: LOGIN
+════════════════════════════════════════════════════════════════ -->
+<div id="view-login" class="view">
+  <div class="login-view">
+    <div class="login-card">
+      <div class="login-logo">Fixr<span style="color:var(--gold)">.</span></div>
+      <div class="login-tagline" data-i18n="login_tagline">Your trusted local service marketplace</div>
 
-  <div class="res-hdr">
-    <span class="res-title" id="resTitle">Electricians nearby</span>
-    <div class="res-meta">
-      <span class="res-count" id="resCount"></span>
-      <label class="avail-toggle">
-        <input type="checkbox" id="availFilter" checked onchange="loadWorkers()">
-        <span data-i18n="available_only">Available only</span>
-      </label>
-    </div>
-  </div>
-  <div id="cards"></div>
-
-  <!-- Customer bookings -->
-  <div id="my-bk-section">
-    <p class="bk-hdr" data-i18n="my_bookings_title">My Bookings</p>
-    <div id="my-bk-list"></div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════ WORKER DASHBOARD ═════════════════════ -->
-<section id="v-worker" class="view">
-  <div class="dash-hdr">
-    <div class="dash-hdr-inner">
-      <button class="back-btn" onclick="showView('v-customer')" data-i18n="back">← Back</button>
-      <div>
-        <div class="dash-ttl" data-i18n="worker_dash_title">Worker Dashboard</div>
-        <div class="dash-sub" id="wDashSub">Manage your profile</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="dash-body">
-    <!-- Profile -->
-    <div class="d-card">
-      <div class="d-ttl">👤 <span data-i18n="your_profile">Your Profile</span></div>
-      <div class="prof-row">
-        <div class="prof-ava" id="wAva"></div>
-        <div>
-          <div class="pname" id="wName"></div>
-          <div class="pcat" id="wCat"></div>
-          <div class="prating" id="wRating"></div>
+      <!-- Step 1: Phone -->
+      <div class="otp-step active" id="step-phone">
+        <div class="alert alert-error" id="phone-error"></div>
+        <div class="field">
+          <label class="field-label" data-i18n="label_name">Name <span style="font-weight:400;text-transform:none;color:var(--ink3)">(new users)</span></label>
+          <input class="field-input" type="text" id="input-name" placeholder="Your full name" data-i18n-ph="ph_name"/>
         </div>
-      </div>
-    </div>
-
-    <!-- Status -->
-    <div class="d-card">
-      <div class="d-ttl">🔵 <span data-i18n="current_status">Current Status</span></div>
-      <div class="st-opts">
-        <div class="st-opt" id="sopt-available" onclick="setWorkerStatus('available')">
-          <div class="se">✅</div>
-          <div class="sl" style="color:var(--green)" data-i18n="st_available">Available</div>
-          <div class="sd" data-i18n="st_available_desc">Ready for work</div>
+        <div class="field">
+          <label class="field-label" data-i18n="label_phone">Phone Number</label>
+          <input class="field-input" type="tel" id="input-phone" placeholder="+91-XXXXX-XXXXX" onkeydown="if(event.key==='Enter')sendOTP()"/>
+          <div class="field-hint" data-i18n="phone_hint">OTP will be printed to server console</div>
         </div>
-        <div class="st-opt" id="sopt-on_job" onclick="setWorkerStatus('on_job')">
-          <div class="se">🔨</div>
-          <div class="sl" style="color:var(--orange)" data-i18n="st_on_job">On a Job</div>
-          <div class="sd" data-i18n="st_on_job_desc">Currently busy</div>
-        </div>
-        <div class="st-opt" id="sopt-unavailable" onclick="setWorkerStatus('unavailable')">
-          <div class="se">🚫</div>
-          <div class="sl" style="color:var(--slate)" data-i18n="st_unavailable">Unavailable</div>
-          <div class="sd" data-i18n="st_unavailable_desc">Not working</div>
-        </div>
+        <button class="btn btn-gold btn-lg btn-full" id="send-otp-btn" onclick="sendOTP()" data-i18n="btn_send_otp">Send OTP</button>
       </div>
-    </div>
 
-    <!-- Time Slots -->
-    <div class="d-card">
-      <div class="d-ttl">📅 <span data-i18n="time_slots">Time Slots</span></div>
-      <div class="slots-list" id="slotsList"></div>
-      <div class="slot-form">
-        <input class="f-in" type="date" id="slotDate" placeholder="Date"/>
-        <input class="f-in" type="text" id="slotStart" placeholder="e.g. 09:00"/>
-        <input class="f-in" type="text" id="slotEnd"   placeholder="e.g. 13:00"/>
-      </div>
-      <button class="slot-add-btn" onclick="addSlot()" data-i18n="add_slot">+ Add Slot</button>
-    </div>
-
-    <!-- My Bookings (worker view) -->
-    <div class="d-card">
-      <div class="d-ttl">📋 <span data-i18n="my_bookings">My Bookings</span></div>
-      <div id="wBookingsList"><div class="sbox"><p class="msg" data-i18n="no_bookings">No bookings yet</p></div></div>
-    </div>
-
-    <!-- Add Assistant -->
-    <div class="d-card">
-      <div class="d-ttl">🤝 <span data-i18n="add_assistant">Add Assistant</span></div>
-      <p class="f-note" data-i18n="add_assistant_note">Link an assistant by their phone number.</p>
-      <div class="asst-form">
-        <input class="f-in" type="text" id="asstPhone" placeholder="+91-XXXXXXXXXX" style="margin:0"/>
-        <button onclick="requestAssistant()" data-i18n="link_btn">Link →</button>
-      </div>
-    </div>
-
-    <div class="save-ok" id="saveOk">✅ <span data-i18n="saved_msg">Changes saved!</span></div>
-    <button class="btn-save" onclick="saveWorkerChanges()" data-i18n="save_changes">Save Changes</button>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════ ASSISTANT DASHBOARD ══════════════════ -->
-<section id="v-assistant" class="view">
-  <div class="dash-hdr">
-    <div class="dash-hdr-inner">
-      <button class="back-btn" onclick="showView('v-customer')" data-i18n="back">← Back</button>
-      <div>
-        <div class="dash-ttl" data-i18n="assistant_dash_title">Assistant Dashboard</div>
-        <div class="dash-sub" id="aDashSub">Manage your availability</div>
-      </div>
-    </div>
-  </div>
-
-  <div class="dash-body">
-    <!-- Profile -->
-    <div class="d-card">
-      <div class="d-ttl">👤 <span data-i18n="your_profile">Your Profile</span></div>
-      <div class="prof-row">
-        <div class="prof-ava" id="aAva"></div>
-        <div>
-          <div class="pname" id="aName"></div>
-          <div class="pcat" data-i18n="role_assistant">Assistant</div>
+      <!-- Step 2: OTP -->
+      <div class="otp-step" id="step-otp">
+        <div class="otp-sent-note" id="otp-sent-note" data-i18n="otp_sent">OTP sent — check server console</div>
+        <div class="alert alert-error" id="otp-error"></div>
+        <div class="field">
+          <label class="field-label" data-i18n="label_otp">Enter 6-digit OTP</label>
+          <input class="field-input otp-style" type="text" id="input-otp" maxlength="6" placeholder="••••••" onkeydown="if(event.key==='Enter')verifyOTP()"/>
         </div>
+        <button class="btn btn-teal btn-lg btn-full" id="verify-otp-btn" onclick="verifyOTP()" data-i18n="btn_verify">Verify &amp; Login</button>
+        <button class="btn btn-ghost btn-md btn-full" style="margin-top:8px" onclick="goBackToPhone()" data-i18n="btn_back_phone">← Change number</button>
       </div>
-    </div>
-
-    <!-- Status -->
-    <div class="d-card">
-      <div class="d-ttl">🔵 <span data-i18n="current_status">Current Status</span></div>
-      <div class="st-opts">
-        <div class="st-opt" id="asopt-available" onclick="setAssistantStatus('available')">
-          <div class="se">✅</div>
-          <div class="sl" style="color:var(--green)" data-i18n="st_available">Available</div>
-          <div class="sd" data-i18n="st_available_desc">Ready for work</div>
-        </div>
-        <div class="st-opt" id="asopt-on_job" onclick="setAssistantStatus('on_job')">
-          <div class="se">🔨</div>
-          <div class="sl" style="color:var(--orange)" data-i18n="st_on_job">On a Job</div>
-          <div class="sd" data-i18n="st_on_job_desc">Currently busy</div>
-        </div>
-        <div class="st-opt" id="asopt-unavailable" onclick="setAssistantStatus('unavailable')">
-          <div class="se">🚫</div>
-          <div class="sl" style="color:var(--slate)" data-i18n="st_unavailable">Unavailable</div>
-          <div class="sd" data-i18n="st_unavailable_desc">Not working</div>
-        </div>
-      </div>
-    </div>
-
-    <!-- Linked worker -->
-    <div class="d-card">
-      <div class="d-ttl">🔗 <span data-i18n="linked_worker">Linked Worker</span></div>
-      <div id="linkedWorkerInfo"></div>
-    </div>
-  </div>
-</section>
-
-<!-- ═══════════════════════════════ LOGIN MODAL ════════════════════════════ -->
-<div class="m-ov" id="m-login">
-  <div class="modal">
-    <button class="m-x" onclick="closeModal('m-login')">✕</button>
-    <div class="m-ttl" data-i18n="login_title">Welcome to Fixr</div>
-    <p class="m-sub" data-i18n="login_sub">Enter your phone to continue</p>
-
-    <!-- Step 1: Phone -->
-    <div class="step active" id="step-phone">
-      <div class="f-err" id="loginErr"></div>
-      <label class="f-label" data-i18n="lbl_name">Your Name <span style="color:var(--muted);font-weight:400">(new users)</span></label>
-      <input class="f-input" id="loginName" type="text" placeholder="Full name (optional)"/>
-      <label class="f-label" data-i18n="lbl_phone">Phone Number</label>
-      <input class="f-input" id="loginPhone" type="tel" placeholder="+91-98201-11111"
-             onkeydown="if(event.key==='Enter')sendOtp()"/>
-      <div class="f-note" data-i18n="otp_note">You will receive a one-time password</div>
-      <button class="btn-prim" id="sendOtpBtn" onclick="sendOtp()" data-i18n="send_otp">Send OTP</button>
-    </div>
-
-    <!-- Step 2: OTP -->
-    <div class="step" id="step-otp">
-      <div class="otp-sent-note show" id="otpSentNote"></div>
-      <div class="f-err" id="otpErr"></div>
-      <label class="f-label" data-i18n="lbl_otp">One-Time Password</label>
-      <input class="f-input" id="otpInput" type="text" maxlength="6" placeholder="000000"
-             onkeydown="if(event.key==='Enter')verifyOtp()" style="letter-spacing:.2em;font-size:1.2rem;text-align:center"/>
-      <button class="btn-prim" id="verifyOtpBtn" onclick="verifyOtp()" data-i18n="verify_otp">Verify &amp; Login</button>
-      <button onclick="goToStep('step-phone')" style="width:100%;background:none;border:none;color:var(--muted);font-size:.78rem;cursor:pointer;margin-top:10px;font-family:'DM Sans',sans-serif" data-i18n="change_phone">← Change phone number</button>
     </div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ BOOKING MODAL ═════════════════════════ -->
-<div class="m-ov" id="m-booking">
-  <div class="modal">
-    <button class="m-x" onclick="closeModal('m-booking')">✕</button>
-    <div class="m-ttl" data-i18n="book_service">Book a Service</div>
-    <p class="m-sub" data-i18n="book_sub">Choose a date and available slot</p>
-
-    <div class="bm-worker" id="bmWorkerInfo"></div>
-
-    <div class="f-err" id="bookErr"></div>
-    <label class="f-label" data-i18n="lbl_date">Select Date</label>
-    <input class="f-input" type="date" id="bookDate" onchange="loadBookingSlots()"/>
-
-    <label class="f-label" data-i18n="lbl_slot">Available Slots</label>
-    <div class="slot-chips" id="slotChips">
-      <span class="no-slots-msg" data-i18n="pick_date_first">Pick a date to see slots</span>
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW: HOME (customer worker list)
+════════════════════════════════════════════════════════════════ -->
+<div id="view-home" class="view">
+  <!-- hero -->
+  <div class="hero">
+    <div class="hero-inner">
+      <div class="hero-eyebrow" data-i18n="hero_eyebrow">Local Services</div>
+      <h1 class="hero-title" data-i18n="hero_title">Find skilled professionals near you</h1>
+      <div class="hero-sub" data-i18n="hero_sub">Browse, book, and get the job done — right in your neighbourhood.</div>
+      <div class="hero-location">
+        <span class="pulse-dot"></span>
+        <span data-i18n="hero_location">Madurai, Tamil Nadu</span>
+      </div>
     </div>
+  </div>
 
-    <label class="f-label" data-i18n="lbl_notes">Notes (optional)</label>
-    <input class="f-input" id="bookNotes" type="text" placeholder="Describe your issue…"/>
+  <!-- category tabs -->
+  <div class="cat-wrap">
+    <div class="cat-scroll" id="cat-scroll">
+      <button class="cat-pill active" data-cat="electrician" onclick="selectCat(this)"><span class="cat-icon">⚡</span><span data-i18n="cat_electrician">Electrician</span></button>
+      <button class="cat-pill" data-cat="plumber" onclick="selectCat(this)"><span class="cat-icon">🔧</span><span data-i18n="cat_plumber">Plumber</span></button>
+      <button class="cat-pill" data-cat="carpenter" onclick="selectCat(this)"><span class="cat-icon">🪚</span><span data-i18n="cat_carpenter">Carpenter</span></button>
+      <button class="cat-pill" data-cat="painter" onclick="selectCat(this)"><span class="cat-icon">🖌️</span><span data-i18n="cat_painter">Painter</span></button>
+      <button class="cat-pill" data-cat="cleaner" onclick="selectCat(this)"><span class="cat-icon">🧹</span><span data-i18n="cat_cleaner">Cleaner</span></button>
+      <button class="cat-pill" data-cat="ac_technician" onclick="selectCat(this)"><span class="cat-icon">❄️</span><span data-i18n="cat_ac">AC Tech</span></button>
+    </div>
+  </div>
 
-    <button class="btn-prim" onclick="confirmBooking()" data-i18n="confirm_booking">Confirm Booking</button>
+  <!-- filter bar -->
+  <div class="section-header">
+    <span class="section-title" id="workers-section-title">Workers</span>
+    <span class="section-count" id="workers-count"></span>
+  </div>
+  <div class="filter-row">
+    <label class="filter-toggle">
+      <input type="checkbox" id="filter-available" checked onchange="loadWorkers()"/>
+      <span data-i18n="filter_available">Available only</span>
+    </label>
+  </div>
+
+  <!-- workers list -->
+  <div class="card-list" id="workers-list"></div>
+
+  <!-- my bookings (customers) -->
+  <div class="bookings-strip" id="my-bookings-strip">
+    <div class="section-header" style="padding-left:0;padding-right:0">
+      <span class="section-title" data-i18n="my_bookings">My Bookings</span>
+    </div>
+    <div id="my-bookings-list"></div>
   </div>
 </div>
 
-<!-- ═══════════════════════════════ BOTTOM NAV ════════════════════════════ -->
-<nav class="bnav" id="bnav">
-  <button class="bn-item active" id="bn-home" onclick="navTo('home')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/>
-    </svg>
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW: WORKER DASHBOARD
+════════════════════════════════════════════════════════════════ -->
+<div id="view-worker-dash" class="view">
+  <div class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-greeting" data-i18n="dash_greeting">Welcome back</div>
+      <h2 class="dash-name" id="worker-dash-name"></h2>
+      <span class="dash-role-tag worker" data-i18n="role_worker">Worker</span>
+    </div>
+  </div>
+  <div class="dash-body">
+
+    <!-- status card -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_status">Your Status</div>
+      <div class="status-selector">
+        <div class="status-opt" id="sopt-available" onclick="setWorkerStatus('available')">
+          <div class="status-opt-icon">✅</div>
+          <div class="status-opt-label available" data-i18n="status_available">Available</div>
+        </div>
+        <div class="status-opt" id="sopt-on_job" onclick="setWorkerStatus('on_job')">
+          <div class="status-opt-icon">🔨</div>
+          <div class="status-opt-label on_job" data-i18n="status_on_job">On Job</div>
+        </div>
+        <div class="status-opt" id="sopt-unavailable" onclick="setWorkerStatus('unavailable')">
+          <div class="status-opt-icon">🚫</div>
+          <div class="status-opt-label unavailable" data-i18n="status_unavailable">Off</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- time slots card -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_slots">Time Slots</div>
+      <div class="slot-list" id="worker-slots-list"></div>
+      <div class="add-slot-form" id="add-slot-form">
+        <input class="field-input" type="date" id="slot-date" title="Date"/>
+        <input class="field-input" type="text" id="slot-start" placeholder="09:00" title="Start"/>
+        <input class="field-input" type="text" id="slot-end" placeholder="17:00" title="End"/>
+      </div>
+      <button class="btn btn-gold btn-md btn-full" onclick="addSlot()" data-i18n="btn_add_slot">+ Add Slot</button>
+    </div>
+
+    <!-- bookings card -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_bookings">Bookings</div>
+      <div id="worker-bookings-list"></div>
+    </div>
+
+    <!-- add assistant -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_assistant">Add Assistant</div>
+      <div class="field" style="margin-bottom:10px">
+        <label class="field-label" data-i18n="label_asst_phone">Assistant Phone</label>
+        <div class="inline-form">
+          <input class="field-input" type="tel" id="asst-phone-input" placeholder="+91-XXXXX-XXXXX"/>
+          <button class="btn btn-teal btn-md" onclick="addAssistant()" data-i18n="btn_link">Link</button>
+        </div>
+      </div>
+      <div class="alert alert-error" id="asst-error"></div>
+      <div class="alert alert-success" id="asst-success"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     VIEW: ASSISTANT DASHBOARD
+════════════════════════════════════════════════════════════════ -->
+<div id="view-asst-dash" class="view">
+  <div class="dash-header">
+    <div class="dash-header-inner">
+      <div class="dash-greeting" data-i18n="dash_greeting">Welcome back</div>
+      <h2 class="dash-name" id="asst-dash-name"></h2>
+      <span class="dash-role-tag assistant" data-i18n="role_assistant">Assistant</span>
+    </div>
+  </div>
+  <div class="dash-body">
+
+    <!-- linked worker -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_linked_worker">Linked Worker</div>
+      <div id="linked-worker-container"></div>
+    </div>
+
+    <!-- status -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_status">Your Status</div>
+      <div class="status-selector">
+        <div class="status-opt" id="aopt-available" onclick="setAssistantStatus('available')">
+          <div class="status-opt-icon">✅</div>
+          <div class="status-opt-label available" data-i18n="status_available">Available</div>
+        </div>
+        <div class="status-opt" id="aopt-on_job" onclick="setAssistantStatus('on_job')">
+          <div class="status-opt-icon">🔨</div>
+          <div class="status-opt-label on_job" data-i18n="status_on_job">On Job</div>
+        </div>
+        <div class="status-opt" id="aopt-unavailable" onclick="setAssistantStatus('unavailable')">
+          <div class="status-opt-icon">🚫</div>
+          <div class="status-opt-label unavailable" data-i18n="status_unavailable">Off</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- assigned jobs -->
+    <div class="dash-card">
+      <div class="dash-card-title" data-i18n="sect_assigned_jobs">Assigned Jobs</div>
+      <div id="asst-jobs-list"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     MODAL: BOOKING
+════════════════════════════════════════════════════════════════ -->
+<div class="modal-backdrop" id="modal-booking" onclick="closeBookingModal(event)">
+  <div class="modal-sheet" onclick="event.stopPropagation()">
+    <div class="modal-handle"></div>
+    <button class="modal-close-btn" onclick="closeBookingModal()">✕</button>
+    <h3 class="modal-title" data-i18n="modal_book_title">Book Service</h3>
+    <div class="modal-sub" id="modal-book-worker-name"></div>
+
+    <div class="alert alert-error" id="book-error"></div>
+    <div class="alert alert-success" id="book-success"></div>
+
+    <div class="field">
+      <label class="field-label" data-i18n="label_date">Select Date</label>
+      <input class="field-input" type="date" id="book-date" onchange="loadSlotsForDate()"/>
+    </div>
+
+    <div class="field">
+      <label class="field-label" data-i18n="label_time_slot">Select Time Slot</label>
+      <div class="slot-chips" id="slot-chips">
+        <span class="no-slots-msg" data-i18n="pick_date_first">Pick a date first</span>
+      </div>
+    </div>
+
+    <div class="field">
+      <label class="field-label" data-i18n="label_notes">Notes <span style="font-weight:400;text-transform:none;color:var(--ink3)">(optional)</span></label>
+      <input class="field-input" type="text" id="book-notes" placeholder="Describe your requirement…" data-i18n-ph="ph_notes"/>
+    </div>
+
+    <button class="btn btn-gold btn-lg btn-full" id="confirm-book-btn" onclick="confirmBooking()" data-i18n="btn_confirm_book">Confirm Booking</button>
+  </div>
+</div>
+
+<!-- ═══════════════════════════════════════════════════════════════
+     BOTTOM NAVIGATION
+════════════════════════════════════════════════════════════════ -->
+<nav id="bottom-nav">
+  <button class="nav-item active" id="nav-home" onclick="navTo('home')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
     <span data-i18n="nav_home">Home</span>
   </button>
-  <button class="bn-item" id="bn-auth" onclick="navTo('auth')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/>
-    </svg>
-    <span id="bnAuthLabel" data-i18n="nav_login">Login</span>
+  <button class="nav-item hidden" id="nav-dash" onclick="navTo('dash')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/></svg>
+    <span data-i18n="nav_dash">Dashboard</span>
   </button>
-  <button class="bn-item" id="bn-bookings" style="display:none" onclick="navTo('bookings')">
-    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round">
-      <rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/>
-    </svg>
+  <button class="nav-item hidden" id="nav-bookings" onclick="navTo('bookings')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="4" width="18" height="18" rx="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg>
     <span data-i18n="nav_bookings">Bookings</span>
+  </button>
+  <button class="nav-item hidden" id="nav-login" onclick="navTo('login')">
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-linecap="round" stroke-linejoin="round"><path d="M20 21v-2a4 4 0 00-4-4H8a4 4 0 00-4 4v2"/><circle cx="12" cy="7" r="4"/></svg>
+    <span data-i18n="nav_login">Login</span>
   </button>
 </nav>
 
-<div id="toast"></div>
-
-<!-- ═══════════════════════════════ JAVASCRIPT ════════════════════════════ -->
+<!-- ═══════════════════════════════════════════════════════════════
+     JAVASCRIPT
+════════════════════════════════════════════════════════════════ -->
 <script>
-/* ══════════════════════════════ CONFIG ══════════════════════════════════ */
-const API_BASE = "";
-
-/* ══════════════════════════════ TRANSLATIONS ════════════════════════════ */
-const TR = {
+/* ── TRANSLATIONS ────────────────────────────────────────────── */
+const I18N = {
   en: {
-    app_tagline:"Trusted local professionals, nearby",
-    what_need:"What do you need?",
-    available_only:"Available only",
-    found:"found",
-    call_now:"Call Now",
-    book_now:"Book Now",
-    busy:"Busy",
-    login_btn:"Login",
-    worker_portal:"Worker Portal",
-    logout_btn:"Logout",
-    dashboard_btn:"Dashboard",
-    back:"← Back",
-
-    st_available:"Available",  st_available_desc:"Ready for work",
-    st_on_job:"On a Job",       st_on_job_desc:"Currently busy",
-    st_unavailable:"Unavailable", st_unavailable_desc:"Not working",
-
-    login_title:"Welcome to Fixr",
-    login_sub:"Enter your phone number to continue",
-    lbl_name:"Your Name",  lbl_phone:"Phone Number",
-    otp_note:"You will receive a one-time password",
-    send_otp:"Send OTP", otp_sent_msg:"OTP sent! Check the server console.",
-    lbl_otp:"One-Time Password", verify_otp:"Verify & Login",
-    change_phone:"← Change phone number",
-
-    worker_dash_title:"Worker Dashboard",
-    your_profile:"Your Profile", current_status:"Current Status",
-    time_slots:"Time Slots", my_bookings:"My Bookings",
-    my_bookings_title:"My Bookings",
-    add_assistant:"Add Assistant",
-    add_assistant_note:"Link an assistant by their phone number.",
-    link_btn:"Link →", no_bookings:"No bookings yet",
-    add_slot:"+ Add Slot", save_changes:"Save Changes", saved_msg:"Changes saved!",
-    role_assistant:"Assistant",
-
-    assistant_dash_title:"Assistant Dashboard",
-    linked_worker:"Linked Worker",
-    no_linked_worker:"No worker linked yet",
-
-    book_service:"Book a Service",
-    book_sub:"Choose a date and available slot",
-    lbl_date:"Select Date", lbl_slot:"Available Slots",
-    lbl_notes:"Notes (optional)", confirm_booking:"Confirm Booking",
-    pick_date_first:"Pick a date to see slots",
-    no_slots_available:"No slots available for this date",
-    booking_success:"Booking confirmed! ✅",
-
-    nav_home:"Home", nav_login:"Login", nav_dashboard:"Dashboard", nav_bookings:"Bookings",
-
-    cat_electrician:"Electrician", cat_plumber:"Plumber",
-    cat_carpenter:"Carpenter",     cat_painter:"Painter",
-    cat_cleaner:"Cleaner",         cat_ac_technician:"AC Tech",
-
-    nearby:"nearby",
-    bk_pending:"Pending",  bk_confirmed:"Confirmed",
-    bk_cancelled:"Cancelled", bk_completed:"Completed",
-    bk_in_progress:"In Progress",
-    next_slot:"Next:",
+    header_login: 'Login', header_logout: 'Logout',
+    login_tagline: 'Your trusted local service marketplace',
+    label_name: 'Name', ph_name: 'Your full name',
+    label_phone: 'Phone Number', phone_hint: 'OTP will be printed to server console',
+    label_otp: 'Enter 6-digit OTP', otp_sent: 'OTP sent — check server console',
+    btn_send_otp: 'Send OTP', btn_verify: 'Verify & Login',
+    btn_back_phone: '← Change number',
+    hero_eyebrow: 'Local Services',
+    hero_title: 'Find skilled professionals near you',
+    hero_sub: 'Browse, book, and get the job done — right in your neighbourhood.',
+    hero_location: 'Madurai, Tamil Nadu',
+    cat_electrician: 'Electrician', cat_plumber: 'Plumber',
+    cat_carpenter: 'Carpenter', cat_painter: 'Painter',
+    cat_cleaner: 'Cleaner', cat_ac: 'AC Tech',
+    filter_available: 'Available only',
+    my_bookings: 'My Bookings',
+    dash_greeting: 'Welcome back',
+    role_worker: 'Worker', role_assistant: 'Assistant', role_customer: 'Customer',
+    sect_status: 'Your Status', sect_slots: 'Time Slots',
+    sect_bookings: 'Bookings', sect_assistant: 'Add Assistant',
+    sect_linked_worker: 'Linked Worker', sect_assigned_jobs: 'Assigned Jobs',
+    status_available: 'Available', status_on_job: 'On Job', status_unavailable: 'Off',
+    btn_add_slot: '+ Add Slot', label_asst_phone: 'Assistant Phone', btn_link: 'Link',
+    modal_book_title: 'Book Service',
+    label_date: 'Select Date', label_time_slot: 'Select Time Slot',
+    label_notes: 'Notes', ph_notes: 'Describe your requirement…',
+    btn_confirm_book: 'Confirm Booking', pick_date_first: 'Pick a date first',
+    no_slots: 'No slots available for this date',
+    nav_home: 'Home', nav_dash: 'Dashboard', nav_bookings: 'Bookings', nav_login: 'Login',
+    call_now: 'Call', book_now: 'Book', status_busy: 'Busy',
+    next_slot: 'Next:',
+    no_workers: 'No workers found', no_workers_sub: 'Try a different category or uncheck "Available only"',
+    no_bookings: 'No bookings yet', loading: 'Loading…',
+    err_phone_req: 'Phone number is required',
+    err_otp_req: 'Please enter the OTP',
+    toast_status_saved: 'Status updated',
+    toast_slot_added: 'Time slot added',
+    toast_slot_deleted: 'Slot removed',
+    toast_booked: 'Booking confirmed!',
+    toast_asst_linked: 'Assistant linked',
+    toast_logged_out: 'Logged out successfully',
+    toast_error: 'Something went wrong',
+    no_linked_worker: 'No linked worker yet',
   },
   ta: {
-    app_tagline:"நம்பகமான உள்ளூர் நிபுணர்கள், அருகில்",
-    what_need:"உங்களுக்கு என்ன தேவை?",
-    available_only:"கிடைக்கக்கூடியவர்கள் மட்டும்",
-    found:"கண்டறியப்பட்டது",
-    call_now:"அழைக்கவும்",
-    book_now:"முன்பதிவு",
-    busy:"பிஸி",
-    login_btn:"உள்நுழைவு",
-    worker_portal:"தொழிலாளர் போர்டல்",
-    logout_btn:"வெளியேறு",
-    dashboard_btn:"டாஷ்போர்டு",
-    back:"← திரும்பு",
-
-    st_available:"கிடைக்கிறார்",   st_available_desc:"வேலைக்கு தயார்",
-    st_on_job:"வேலையில்",           st_on_job_desc:"தற்போது பிஸி",
-    st_unavailable:"கிடைக்கவில்லை", st_unavailable_desc:"இல்லை",
-
-    login_title:"Fixr-க்கு வரவேற்கிறோம்",
-    login_sub:"தொடர உங்கள் தொலைபேசி எண்ணை உள்ளிடுக",
-    lbl_name:"உங்கள் பெயர்",  lbl_phone:"தொலைபேசி எண்",
-    otp_note:"ஒரு முறை கடவுச்சொல் அனுப்பப்படும்",
-    send_otp:"OTP அனுப்பு", otp_sent_msg:"OTP அனுப்பப்பட்டது! சர்வர் கன்சோலில் பார்க்கவும்.",
-    lbl_otp:"OTP (ஒரு முறை கடவுச்சொல்)", verify_otp:"சரிபார்த்து உள்நுழை",
-    change_phone:"← தொலைபேசி எண்ணை மாற்று",
-
-    worker_dash_title:"தொழிலாளர் டாஷ்போர்டு",
-    your_profile:"உங்கள் சுயவிவரம்", current_status:"தற்போதைய நிலை",
-    time_slots:"நேர இடைவெளிகள்", my_bookings:"என் முன்பதிவுகள்",
-    my_bookings_title:"என் முன்பதிவுகள்",
-    add_assistant:"உதவியாளர் சேர்",
-    add_assistant_note:"உதவியாளரின் தொலைபேசி எண் மூலம் இணைக்கவும்.",
-    link_btn:"இணை →", no_bookings:"முன்பதிவுகள் இல்லை",
-    add_slot:"+ இடைவெளி சேர்", save_changes:"மாற்றங்களை சேமி", saved_msg:"சேமிக்கப்பட்டது! ✅",
-    role_assistant:"உதவியாளர்",
-
-    assistant_dash_title:"உதவியாளர் டாஷ்போர்டு",
-    linked_worker:"இணைக்கப்பட்ட தொழிலாளர்",
-    no_linked_worker:"இன்னும் தொழிலாளர் இணைக்கப்படவில்லை",
-
-    book_service:"சேவையை முன்பதிவு செய்",
-    book_sub:"தேதி மற்றும் நேர இடைவெளியை தேர்ந்தெடுக்கவும்",
-    lbl_date:"தேதி தேர்ந்தெடு", lbl_slot:"கிடைக்கக்கூடிய நேர இடைவெளிகள்",
-    lbl_notes:"குறிப்புகள் (விருப்பத்திற்கு)", confirm_booking:"முன்பதிவை உறுதிப்படுத்து",
-    pick_date_first:"நேர இடைவெளிகளை காண தேதியை தேர்ந்தெடுக்கவும்",
-    no_slots_available:"இந்த தேதியில் இடைவெளிகள் இல்லை",
-    booking_success:"முன்பதிவு உறுதிப்படுத்தப்பட்டது! ✅",
-
-    nav_home:"முகப்பு", nav_login:"உள்நுழைவு", nav_dashboard:"டாஷ்போர்டு", nav_bookings:"முன்பதிவுகள்",
-
-    cat_electrician:"மின்சாரி", cat_plumber:"குழாய்ப் பணி",
-    cat_carpenter:"தச்சர்",     cat_painter:"ஓவியர்",
-    cat_cleaner:"சுத்தகார்",    cat_ac_technician:"AC தொழில்நுட்பி",
-
-    nearby:"அருகில்",
-    bk_pending:"நிலுவையில்", bk_confirmed:"உறுதிப்படுத்தப்பட்டது",
-    bk_cancelled:"ரத்து",      bk_completed:"முடிந்தது",
-    bk_in_progress:"நடந்துகொண்டிருக்கிறது",
-    next_slot:"அடுத்து:",
+    header_login: 'உள்நுழை', header_logout: 'வெளியேறு',
+    login_tagline: 'நம்பகமான உள்ளூர் சேவை சந்தை',
+    label_name: 'பெயர்', ph_name: 'உங்கள் முழு பெயர்',
+    label_phone: 'தொலைபேசி எண்', phone_hint: 'OTP சர்வர் கன்சோலில் அச்சிடப்படும்',
+    label_otp: '6-இலக்க OTP உள்ளிடவும்', otp_sent: 'OTP அனுப்பப்பட்டது — கன்சோலைப் பாருங்கள்',
+    btn_send_otp: 'OTP அனுப்பு', btn_verify: 'சரிபார்த்து உள்நுழைக',
+    btn_back_phone: '← எண்ணை மாற்றவும்',
+    hero_eyebrow: 'உள்ளூர் சேவைகள்',
+    hero_title: 'திறமையான தொழில் வல்லுநர்களை கண்டறியுங்கள்',
+    hero_sub: 'உலாவி, முன்பதிவு செய்து, வேலை முடியுங்கள் — உங்கள் அருகில்.',
+    hero_location: 'மதுரை, தமிழ்நாடு',
+    cat_electrician: 'மின்சாரி', cat_plumber: 'குழாய்', cat_carpenter: 'தச்சு',
+    cat_painter: 'சாயமடிப்பு', cat_cleaner: 'சுத்தம்', cat_ac: 'AC தொழில்நுட்பர்',
+    filter_available: 'கிடைக்கும் மட்டும்',
+    my_bookings: 'என் முன்பதிவுகள்',
+    dash_greeting: 'மீண்டும் வரவேற்கிறோம்',
+    role_worker: 'தொழிலாளர்', role_assistant: 'உதவியாளர்', role_customer: 'வாடிக்கையாளர்',
+    sect_status: 'உங்கள் நிலை', sect_slots: 'நேர இடைவெளிகள்',
+    sect_bookings: 'முன்பதிவுகள்', sect_assistant: 'உதவியாளரை சேர்',
+    sect_linked_worker: 'இணைக்கப்பட்ட தொழிலாளர்', sect_assigned_jobs: 'ஒதுக்கப்பட்ட வேலைகள்',
+    status_available: 'கிடைக்கும்', status_on_job: 'வேலையில்', status_unavailable: 'இல்லை',
+    btn_add_slot: '+ இடைவெளி சேர்', label_asst_phone: 'உதவியாளர் தொலைபேசி', btn_link: 'இணை',
+    modal_book_title: 'சேவை முன்பதிவு',
+    label_date: 'தேதி தேர்வு', label_time_slot: 'நேர இடைவெளி தேர்வு',
+    label_notes: 'குறிப்புகள்', ph_notes: 'உங்கள் தேவையை விவரிக்கவும்…',
+    btn_confirm_book: 'முன்பதிவை உறுதிப்படுத்து', pick_date_first: 'முதலில் தேதி தேர்வு செய்யவும்',
+    no_slots: 'இந்த தேதிக்கு இடைவெளிகள் இல்லை',
+    nav_home: 'முகப்பு', nav_dash: 'டாஷ்போர்டு', nav_bookings: 'முன்பதிவுகள்', nav_login: 'உள்நுழை',
+    call_now: 'அழை', book_now: 'முன்பதிவு', status_busy: 'பிஸி',
+    next_slot: 'அடுத்தது:',
+    no_workers: 'தொழிலாளர்கள் கிடைக்கவில்லை', no_workers_sub: 'வேறு பிரிவை முயற்சிக்கவும்',
+    no_bookings: 'இன்னும் முன்பதிவுகள் இல்லை', loading: 'ஏற்றுகிறது…',
+    err_phone_req: 'தொலைபேசி எண் தேவை',
+    err_otp_req: 'OTP உள்ளிடவும்',
+    toast_status_saved: 'நிலை புதுப்பிக்கப்பட்டது',
+    toast_slot_added: 'நேர இடைவெளி சேர்க்கப்பட்டது',
+    toast_slot_deleted: 'இடைவெளி நீக்கப்பட்டது',
+    toast_booked: 'முன்பதிவு உறுதிப்படுத்தப்பட்டது!',
+    toast_asst_linked: 'உதவியாளர் இணைக்கப்பட்டார்',
+    toast_logged_out: 'வெற்றிகரமாக வெளியேறினீர்கள்',
+    toast_error: 'ஏதோ தவறு நடந்தது',
+    no_linked_worker: 'இன்னும் தொழிலாளர் இல்லை',
   }
 };
 
-/* ══════════════════════════════ STATE ═══════════════════════════════════ */
+/* ── STATE ───────────────────────────────────────────────────── */
 const S = {
-  token:   localStorage.getItem("fixr_token"),
-  user:    JSON.parse(localStorage.getItem("fixr_user")    || "null"),
-  profile: JSON.parse(localStorage.getItem("fixr_profile") || "null"),
-  lang:    localStorage.getItem("fixr_lang") || "en",
-  cat:     "electrician",
-  bookingWorker:   null,
-  bookingSlotId:   null,
-  workerSlotsLocal: [],
+  lang: localStorage.getItem('fixr_lang') || 'en',
+  token: localStorage.getItem('fixr_token') || null,
+  role: localStorage.getItem('fixr_role') || null,
+  userId: localStorage.getItem('fixr_user_id') || null,
+  userName: localStorage.getItem('fixr_user_name') || null,
+  profileId: localStorage.getItem('fixr_profile_id') || null, // worker/assistant DB id
+  currentCat: 'electrician',
+  currentView: 'home',
+  workerStatus: 'available',
+  assistantStatus: 'available',
+  bookingWorker: null,
+  selectedSlotId: null,
+  workerSlots: [],
 };
 
-/* ══════════════════════════════ HELPERS ══════════════════════════════════ */
-function t(k){ return (TR[S.lang]||TR.en)[k] || k }
+/* ── UTILS ───────────────────────────────────────────────────── */
+const t = k => (I18N[S.lang] || I18N.en)[k] || k;
+const qs = sel => document.querySelector(sel);
+const qsa = sel => document.querySelectorAll(sel);
+const initials = name => (name || '?').trim().split(/\s+/).slice(0,2).map(w => w[0]).join('').toUpperCase();
+const escHtml = s => String(s).replace(/[&<>"']/g, m => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[m]));
+const starsHtml = r => {
+  const f = Math.floor(r), h = r % 1 >= .5 ? 1 : 0, e = 5 - f - h;
+  return '★'.repeat(f) + (h ? '½' : '') + '☆'.repeat(e);
+};
+const today = () => new Date().toISOString().split('T')[0];
+const fmtDate = d => d ? new Date(d + 'T00:00:00').toLocaleDateString(S.lang === 'ta' ? 'ta-IN' : 'en-IN', {day:'numeric',month:'short',year:'numeric'}) : '';
 
-function initials(name){
-  return (name||"?").split(" ").map(w=>w[0]).slice(0,2).join("").toUpperCase();
+/* ── TOAST ───────────────────────────────────────────────────── */
+let toastId = 0;
+function showToast(msg, type = 'default', duration = 3000) {
+  const id = ++toastId;
+  const div = document.createElement('div');
+  div.className = 'toast ' + (type === 'error' ? 'error' : type === 'success' ? 'success' : '');
+  div.textContent = msg;
+  div.id = 'toast-' + id;
+  qs('#toast-container').prepend(div);
+  setTimeout(() => { const el = document.getElementById('toast-' + id); if (el) el.remove(); }, duration);
 }
 
-function stars(r){
-  let h="";
-  for(let i=1;i<=5;i++){
-    if(i<=Math.floor(r)) h+=`<span class="star">★</span>`;
-    else if(i===Math.ceil(r)&&r%1>=0.5) h+=`<span class="star">½</span>`;
-    else h+=`<span class="star e">☆</span>`;
-  }
-  return h;
-}
-
-let _tt;
-function toast(msg){ clearTimeout(_tt); const el=document.getElementById("toast"); el.textContent=msg; el.classList.add("show"); _tt=setTimeout(()=>el.classList.remove("show"),2800); }
-
-function setBtn(id,txt,disabled){
-  const b=document.getElementById(id);
-  if(!b)return; b.textContent=txt; b.disabled=!!disabled;
-}
-
-/* ══════════════════════════════ API FETCH ════════════════════════════════ */
-async function api(method, path, body=null){
-  const opts = {
-    method,
-    headers: {
-      "Content-Type":"application/json",
-      ...(S.token?{"Authorization":`Bearer ${S.token}`}:{})
-    }
-  };
-  if(body) opts.body = JSON.stringify(body);
-  try{
-    const res = await fetch(`${API_BASE}${path}`, opts);
-    return res.json();
-  }catch(e){
-    return {success:false,error:"Cannot reach server — is Flask running?"};
-  }
-}
-
-/* ══════════════════════════════ i18n APPLY ═══════════════════════════════ */
-function applyLang(){
-  document.documentElement.lang = S.lang==="ta"?"ta":"en";
-  document.querySelectorAll("[data-i18n]").forEach(el=>{
-    const k = el.dataset.i18n;
-    if(TR[S.lang]?.[k]) el.textContent = TR[S.lang][k];
+/* ── i18n ────────────────────────────────────────────────────── */
+function applyLang() {
+  document.documentElement.lang = S.lang;
+  qsa('[data-i18n]').forEach(el => {
+    const key = el.getAttribute('data-i18n');
+    if (I18N[S.lang][key]) el.textContent = I18N[S.lang][key];
   });
-  document.getElementById("langBtn").textContent = S.lang==="en"?"தமிழ்":"English";
-  document.getElementById("whatNeedLabel").textContent = t("what_need");
-  const af=document.querySelector(".avail-toggle span[data-i18n='available_only']");
-  if(af) af.textContent=t("available_only");
-  updateHeaderBtns();
+  qsa('[data-i18n-ph]').forEach(el => {
+    const key = el.getAttribute('data-i18n-ph');
+    if (I18N[S.lang][key]) el.placeholder = I18N[S.lang][key];
+  });
+  qs('#lang-toggle-btn').textContent = S.lang === 'en' ? 'தமிழ்' : 'English';
 }
-
-function toggleLang(){
-  S.lang = S.lang==="en"?"ta":"en";
-  localStorage.setItem("fixr_lang",S.lang);
+function toggleLang() {
+  S.lang = S.lang === 'en' ? 'ta' : 'en';
+  localStorage.setItem('fixr_lang', S.lang);
   applyLang();
-  loadWorkers();
+  if (S.currentView === 'home') loadWorkers();
 }
 
-/* ══════════════════════════════ VIEW MANAGEMENT ══════════════════════════ */
-function showView(id){
-  document.querySelectorAll(".view").forEach(v=>v.classList.remove("active"));
-  document.getElementById(id).classList.add("active");
-  // nav highlight
-  document.querySelectorAll(".bn-item").forEach(b=>b.classList.remove("active"));
-  if(id==="v-customer") document.getElementById("bn-home").classList.add("active");
-}
-
-/* ══════════════════════════════ HEADER BUTTONS ═══════════════════════════ */
-function updateHeaderBtns(){
-  const authBtn  = document.getElementById("authBtn");
-  const dashBtn  = document.getElementById("dashBtn");
-  const bnAuth   = document.getElementById("bn-auth");
-  const bnBk     = document.getElementById("bn-bookings");
-  const bnAuthLbl= document.getElementById("bnAuthLabel");
-
-  if(S.user){
-    authBtn.textContent = t("logout_btn");
-    dashBtn.style.display = "inline-block";
-    dashBtn.textContent = t("dashboard_btn");
-    bnAuthLbl.textContent = t("nav_dashboard");
-    if(S.user.role==="customer") bnBk.style.display="flex";
-  } else {
-    authBtn.textContent = t("login_btn");
-    dashBtn.style.display = "none";
-    bnAuthLbl.textContent = t("nav_login");
-    bnBk.style.display = "none";
-    document.getElementById("my-bk-section").classList.remove("show");
+/* ── API HELPER ──────────────────────────────────────────────── */
+async function apiFetch(method, path, body = null) {
+  const headers = { 'Content-Type': 'application/json' };
+  if (S.token) headers['Authorization'] = 'Bearer ' + S.token;
+  const opts = { method, headers };
+  if (body) opts.body = JSON.stringify(body);
+  try {
+    const res = await fetch(path, opts);
+    const data = await res.json().catch(() => ({}));
+    return { ok: res.ok, status: res.status, data };
+  } catch (e) {
+    return { ok: false, status: 0, data: { error: 'Network error — check your connection' } };
   }
 }
 
-function handleAuthBtn(){
-  if(S.user) logout();
-  else openModal("m-login");
+/* ── VIEW ROUTING ────────────────────────────────────────────── */
+function showView(name) {
+  qsa('.view').forEach(v => v.classList.remove('active'));
+  const el = qs('#view-' + name.replace('/', '-'));
+  if (el) el.classList.add('active');
+  S.currentView = name;
+  qsa('.nav-item').forEach(n => n.classList.remove('active'));
+  const navEl = qs('#nav-' + name.split('-')[0]);
+  if (navEl) navEl.classList.add('active');
 }
 
-function openDash(){
-  if(!S.user) return openModal("m-login");
-  if(S.user.role==="worker")    openWorkerDash();
-  else if(S.user.role==="assistant") openAssistantDash();
-}
-
-/* ══════════════════════════════ CUSTOMER WORKERS ═════════════════════════ */
-const CAT_LABELS = {
-  electrician:"cat_electrician", plumber:"cat_plumber",
-  carpenter:"cat_carpenter",     painter:"cat_painter",
-  cleaner:"cat_cleaner",         ac_technician:"cat_ac_technician"
-};
-const ST_LABELS = { available:"st_available", on_job:"st_on_job", unavailable:"st_unavailable" };
-
-async function loadWorkers(){
-  const container = document.getElementById("cards");
-  const availOnly = document.getElementById("availFilter").checked;
-  container.innerHTML = `<div class="sbox"><div class="spin"></div></div>`;
-
-  const statusQ = availOnly ? "&status=available" : "";
-  const data = await api("GET", `/api/workers?service=${S.cat}${statusQ}`);
-
-  document.getElementById("resTitle").textContent =
-    `${t(CAT_LABELS[S.cat]||S.cat)} ${t("nearby")}`;
-
-  if(!data.success){
-    container.innerHTML = `<div class="sbox"><div class="ico">⚠️</div><p class="msg">${data.error}</p></div>`;
-    return;
-  }
-
-  document.getElementById("resCount").textContent = data.count ? `${data.count} ${t("found")}` : "";
-
-  if(!data.workers.length){
-    container.innerHTML = `<div class="sbox"><div class="ico">😕</div><p class="msg">No workers found.<br>Try unchecking "Available only".</p></div>`;
-    return;
-  }
-
-  container.innerHTML = "";
-  data.workers.forEach((w,i)=>{
-    const st    = w.status || "unavailable";
-    const canCall = st==="available";
-    const canBook = S.user?.role==="customer" && canCall;
-    const nextSlot = w.next_slot
-      ? `<div class="next-slot">${t("next_slot")} ${w.next_slot.date} ${w.next_slot.start_time}–${w.next_slot.end_time}</div>`
-      : "";
-    const card = document.createElement("div");
-    card.className = `w-card${st!=="available"?" busy":""}`;
-    card.style.animationDelay = `${i*50}ms`;
-    card.innerHTML = `
-      <div class="ava">${initials(w.name)}<div class="sdot ${st}"></div></div>
-      <div class="w-info">
-        <div class="w-name">${w.name}</div>
-        <div class="w-meta">
-          <div class="stars">${stars(w.rating)}<span class="rnum">${w.rating}</span></div>
-          <span class="dist-b">📍 ${w.distance_km} km</span>
-          <span class="st-b ${st}">${t(ST_LABELS[st]||st)}</span>
-        </div>
-        ${nextSlot}
-      </div>
-      <div class="card-acts">
-        ${canCall
-          ? `<button class="call-btn" onclick="callWorker('${w.name}','${w.phone}')">📞 ${t("call_now")}</button>`
-          : `<button class="call-btn off" disabled>${t("busy")}</button>`}
-        ${canBook
-          ? `<button class="book-btn" onclick="openBookingModal(${JSON.stringify(w).replace(/"/g,'&quot;')})">📅 ${t("book_now")}</button>`
-          : ""}
-      </div>`;
-    container.appendChild(card);
-  });
-}
-
-function callWorker(name, phone){
-  toast(`📞 Calling ${name}…`);
-  setTimeout(()=>window.open(`tel:${phone}`),200);
-}
-
-/* ══════════════════════════════ CATEGORY TABS ════════════════════════════ */
-document.querySelectorAll(".cat-btn").forEach(btn=>{
-  btn.addEventListener("click",()=>{
-    document.querySelectorAll(".cat-btn").forEach(b=>b.classList.remove("active"));
-    btn.classList.add("active");
-    S.cat = btn.dataset.service;
+function navTo(dest) {
+  if (dest === 'login') { showView('login'); return; }
+  if (dest === 'home') { showView('home'); loadWorkers(); return; }
+  if (dest === 'bookings') {
+    if (!S.token) { showView('login'); return; }
+    showView('home');
     loadWorkers();
-  });
-});
-
-/* ══════════════════════════════ LOGIN MODAL ══════════════════════════════ */
-function openModal(id){
-  document.getElementById(id).classList.add("open");
-  if(id==="m-login"){
-    goToStep("step-phone");
-    setTimeout(()=>document.getElementById("loginPhone").focus(),120);
-  }
-}
-
-function closeModal(id){
-  document.getElementById(id).classList.remove("open");
-  // Reset login form
-  if(id==="m-login"){
-    document.getElementById("loginPhone").value="";
-    document.getElementById("loginName").value="";
-    document.getElementById("otpInput").value="";
-    document.getElementById("loginErr").classList.remove("show");
-    document.getElementById("otpErr").classList.remove("show");
-  }
-  if(id==="m-booking"){
-    document.getElementById("bookDate").value="";
-    document.getElementById("slotChips").innerHTML=`<span class="no-slots-msg">${t("pick_date_first")}</span>`;
-    document.getElementById("bookNotes").value="";
-    S.bookingSlotId=null;
-    document.getElementById("bookErr").classList.remove("show");
-  }
-}
-
-// Close on overlay click
-document.querySelectorAll(".m-ov").forEach(ov=>{
-  ov.addEventListener("click",e=>{
-    if(e.target===ov) closeModal(ov.id);
-  });
-});
-
-function goToStep(stepId){
-  document.querySelectorAll(".step").forEach(s=>s.classList.remove("active"));
-  document.getElementById(stepId).classList.add("active");
-}
-
-async function sendOtp(){
-  const phone = document.getElementById("loginPhone").value.trim();
-  const name  = document.getElementById("loginName").value.trim();
-  const errEl = document.getElementById("loginErr");
-  errEl.classList.remove("show");
-
-  if(!phone){ errEl.textContent="Phone number is required"; errEl.classList.add("show"); return; }
-
-  setBtn("sendOtpBtn","Sending…",true);
-  const res = await api("POST","/api/send-otp",{phone,name});
-  setBtn("sendOtpBtn",t("send_otp"),false);
-
-  if(!res.success){
-    errEl.textContent=res.error||"Failed to send OTP";
-    errEl.classList.add("show");
+    if (S.role === 'customer') {
+      setTimeout(() => { qs('#my-bookings-strip').scrollIntoView({ behavior: 'smooth' }); }, 300);
+    }
     return;
   }
-
-  document.getElementById("otpSentNote").textContent = t("otp_sent_msg");
-  goToStep("step-otp");
-  setTimeout(()=>document.getElementById("otpInput").focus(),100);
+  if (dest === 'dash') {
+    if (!S.token) { showView('login'); return; }
+    openDashboard();
+    return;
+  }
 }
 
-async function verifyOtp(){
-  const phone = document.getElementById("loginPhone").value.trim();
-  const name  = document.getElementById("loginName").value.trim();
-  const otp   = document.getElementById("otpInput").value.trim();
-  const errEl = document.getElementById("otpErr");
-  errEl.classList.remove("show");
+function openDashboard() {
+  if (S.role === 'worker') { loadWorkerDash(); showView('worker-dash'); }
+  else if (S.role === 'assistant') { loadAsstDash(); showView('asst-dash'); }
+  else { showView('home'); }
+}
 
-  if(!otp){ errEl.textContent="Please enter the OTP"; errEl.classList.add("show"); return; }
+/* ── AUTH UI ─────────────────────────────────────────────────── */
+function updateAuthUI() {
+  const loggedIn = !!S.token;
+  qs('#login-btn').style.display = loggedIn ? 'none' : '';
+  qs('#logout-btn').style.display = loggedIn ? '' : 'none';
+  const roleTag = qs('#header-role-tag');
+  if (loggedIn && S.role) {
+    roleTag.textContent = t('role_' + S.role);
+    roleTag.style.display = '';
+  } else {
+    roleTag.style.display = 'none';
+  }
+  // Nav items
+  qs('#nav-login').classList.toggle('hidden', loggedIn);
+  qs('#nav-home').classList.remove('hidden');
+  qs('#nav-dash').classList.toggle('hidden', !loggedIn || S.role === 'customer');
+  qs('#nav-bookings').classList.toggle('hidden', !loggedIn);
+}
 
-  setBtn("verifyOtpBtn","Verifying…",true);
-  const res = await api("POST","/api/verify-otp",{phone,otp,name});
-  setBtn("verifyOtpBtn",t("verify_otp"),false);
+/* ── OTP FLOW ────────────────────────────────────────────────── */
+function setOtpStep(step) {
+  qsa('.otp-step').forEach(s => s.classList.remove('active'));
+  qs('#step-' + step).classList.add('active');
+}
 
-  if(!res.success){
-    errEl.textContent=res.error||"Invalid OTP";
-    errEl.classList.add("show");
+function showFieldError(id, msg) {
+  const el = qs('#' + id);
+  if (!el) return;
+  el.textContent = msg;
+  el.classList.add('show');
+}
+function clearFieldError(id) {
+  const el = qs('#' + id);
+  if (!el) return;
+  el.textContent = '';
+  el.classList.remove('show');
+}
+
+async function sendOTP() {
+  clearFieldError('phone-error');
+  const phone = qs('#input-phone').value.trim();
+  const name = qs('#input-name').value.trim();
+  if (!phone) { showFieldError('phone-error', t('err_phone_req')); return; }
+
+  const btn = qs('#send-otp-btn');
+  btn.disabled = true;
+  btn.textContent = t('loading');
+
+  const { ok, data } = await apiFetch('POST', '/api/send-otp', { phone, name });
+  btn.disabled = false;
+  btn.textContent = t('btn_send_otp');
+
+  if (!ok || !data.success) {
+    showFieldError('phone-error', data.error || t('toast_error'));
+    return;
+  }
+  qs('#otp-sent-note').textContent = t('otp_sent');
+  setOtpStep('otp');
+  setTimeout(() => qs('#input-otp').focus(), 100);
+}
+
+async function verifyOTP() {
+  clearFieldError('otp-error');
+  const phone = qs('#input-phone').value.trim();
+  const otp = qs('#input-otp').value.trim();
+  const name = qs('#input-name').value.trim();
+  if (!otp) { showFieldError('otp-error', t('err_otp_req')); return; }
+
+  const btn = qs('#verify-otp-btn');
+  btn.disabled = true;
+  btn.textContent = t('loading');
+
+  const { ok, data } = await apiFetch('POST', '/api/verify-otp', { phone, otp, name });
+  btn.disabled = false;
+  btn.textContent = t('btn_verify');
+
+  if (!ok || !data.success) {
+    showFieldError('otp-error', data.error || t('toast_error'));
     return;
   }
 
   // Store session
-  S.token   = res.token;
-  S.user    = res.user;
-  S.profile = res.profile;
-  localStorage.setItem("fixr_token",   S.token);
-  localStorage.setItem("fixr_user",    JSON.stringify(S.user));
-  localStorage.setItem("fixr_profile", JSON.stringify(S.profile));
+  S.token = data.token;
+  S.role = data.user?.role || data.role;
+  S.userId = data.user?.id || null;
+  S.userName = data.user?.name || name || 'User';
+  localStorage.setItem('fixr_token', S.token);
+  localStorage.setItem('fixr_role', S.role);
+  localStorage.setItem('fixr_user_id', S.userId || '');
+  localStorage.setItem('fixr_user_name', S.userName || '');
 
-  closeModal("m-login");
-  toast(`👋 Welcome, ${S.user.name}!`);
-  updateHeaderBtns();
+  // Profile id (worker/asst)
+  if (data.profile?.id) {
+    S.profileId = data.profile.id;
+    localStorage.setItem('fixr_profile_id', S.profileId);
+  }
+
+  updateAuthUI();
   applyLang();
-  loadWorkers();
 
-  // Auto-open dashboard for workers/assistants
-  if(S.user.role==="worker")     openWorkerDash();
-  else if(S.user.role==="assistant") openAssistantDash();
-  else {
-    loadMyBookings();
-    showView("v-customer");
-  }
-}
-
-function logout(){
-  S.token=S.user=S.profile=null;
-  localStorage.removeItem("fixr_token");
-  localStorage.removeItem("fixr_user");
-  localStorage.removeItem("fixr_profile");
-  toast("👋 Logged out");
-  updateHeaderBtns();
-  showView("v-customer");
-  loadWorkers();
-}
-
-/* ══════════════════════════════ WORKER DASHBOARD ═════════════════════════ */
-async function openWorkerDash(){
-  if(!S.user||S.user.role!=="worker") return;
-  showView("v-worker");
-  document.getElementById("bn-auth").classList.add("active");
-  document.getElementById("bn-home").classList.remove("active");
-
-  const data = await api("GET","/api/me");
-  if(!data.success) return;
-  S.profile = data.profile;
-
-  const w = S.profile;
-  document.getElementById("wAva").textContent    = initials(S.user.name);
-  document.getElementById("wName").textContent   = S.user.name;
-  document.getElementById("wCat").textContent    = t(CAT_LABELS[w.category]||w.category);
-  document.getElementById("wRating").textContent = "★".repeat(Math.round(w.rating))+" "+w.rating+"/5";
-  document.getElementById("wDashSub").textContent = `Hi ${S.user.name.split(" ")[0]} 👋`;
-
-  highlightStatus(w.status,"sopt");
-  loadWorkerSlots();
-  loadWorkerBookings();
-}
-
-function highlightStatus(status,prefix){
-  ["available","on_job","unavailable"].forEach(s=>{
-    const el = document.getElementById(`${prefix}-${s}`);
-    if(!el)return;
-    el.className="st-opt"+(status===s?` sel-${s}`:"");
-  });
-}
-
-async function setWorkerStatus(status){
-  if(!S.profile) return;
-  const res = await api("PUT",`/api/workers/${S.profile.id}/status`,{status});
-  if(res.success){
-    S.profile.status=status;
-    highlightStatus(status,"sopt");
-    toast(`Status: ${t(ST_LABELS[status])}`);
+  // Redirect by role
+  if (S.role === 'customer') {
+    showView('home');
     loadWorkers();
-  } else {
-    toast("❌ "+res.error);
-  }
-}
-
-async function loadWorkerSlots(){
-  if(!S.profile) return;
-  const res = await api("GET",`/api/workers/${S.profile.id}/slots`);
-  const el  = document.getElementById("slotsList");
-  if(!res.success){ el.innerHTML="<p style='font-size:.78rem;color:var(--muted)'>Could not load slots</p>"; return; }
-  S.workerSlotsLocal = res.slots;
-  renderSlots();
-}
-
-function renderSlots(){
-  const el = document.getElementById("slotsList");
-  if(!S.workerSlotsLocal.length){
-    el.innerHTML=`<p style="font-size:.78rem;color:var(--muted)" data-i18n="no_slots">${t("no_slots")}</p>`;
-    return;
-  }
-  el.innerHTML = S.workerSlotsLocal.map(s=>`
-    <div class="slot-row">
-      <span>
-        <span class="slot-tag">${s.date}</span>
-        ${s.start_time} – ${s.end_time}
-        ${s.is_booked?'<span style="font-size:.65rem;color:var(--orange)"> (booked)</span>':""}
-      </span>
-      ${!s.is_booked
-        ? `<button class="slot-del" onclick="deleteSlot(${s.id})">✕</button>`
-        : `<span style="font-size:.7rem;color:var(--orange)">🔒</span>`}
-    </div>`
-  ).join("");
-}
-
-async function addSlot(){
-  const date  = document.getElementById("slotDate").value;
-  const start = document.getElementById("slotStart").value.trim();
-  const end   = document.getElementById("slotEnd").value.trim();
-  if(!date||!start||!end){ toast("⚠️ Fill in date, start and end time"); return; }
-
-  const res = await api("POST",`/api/workers/${S.profile.id}/slots`,
-    {date,start_time:start,end_time:end});
-  if(res.success){
-    S.workerSlotsLocal.push(res.slot);
-    renderSlots();
-    document.getElementById("slotDate").value="";
-    document.getElementById("slotStart").value="";
-    document.getElementById("slotEnd").value="";
-    toast("✅ Slot added");
-  } else {
-    toast("❌ "+res.error);
-  }
-}
-
-async function deleteSlot(slotId){
-  const res = await api("DELETE",`/api/slots/${slotId}`);
-  if(res.success){
-    S.workerSlotsLocal = S.workerSlotsLocal.filter(s=>s.id!==slotId);
-    renderSlots();
-    toast("🗑️ Slot removed");
-  } else {
-    toast("❌ "+res.error);
-  }
-}
-
-async function loadWorkerBookings(){
-  if(!S.profile) return;
-  const res = await api("GET",`/api/workers/${S.profile.id}/bookings`);
-  const el  = document.getElementById("wBookingsList");
-  if(!res.success||!res.bookings.length){
-    el.innerHTML=`<div class="sbox"><p class="msg" data-i18n="no_bookings">${t("no_bookings")}</p></div>`;
-    return;
-  }
-  const BK_ST = { pending:"bk_pending",confirmed:"bk_confirmed",cancelled:"bk_cancelled",completed:"bk_completed",in_progress:"bk_in_progress" };
-  el.innerHTML = res.bookings.map(b=>`
-    <div class="bk-row">
-      <div class="bk-info">
-        <div class="bk-who">📞 ${b.customer_name}</div>
-        <div class="bk-date">📅 ${b.date} ${b.customer_phone||""}</div>
-        ${b.notes?`<div class="bk-date">📝 ${b.notes}</div>`:""}
-      </div>
-      <span class="bk-st ${b.status}">${t(BK_ST[b.status]||b.status)}</span>
-    </div>`
-  ).join("");
-}
-
-async function requestAssistant(){
-  const phone = document.getElementById("asstPhone").value.trim();
-  if(!phone){ toast("⚠️ Enter assistant's phone number"); return; }
-  const res = await api("POST","/api/assistant/request",{phone});
-  if(res.success){
-    toast("✅ "+res.message);
-    document.getElementById("asstPhone").value="";
-  } else {
-    toast("❌ "+res.error);
-  }
-}
-
-function saveWorkerChanges(){
-  const ok=document.getElementById("saveOk");
-  ok.classList.add("show");
-  toast(t("saved_msg"));
-  setTimeout(()=>ok.classList.remove("show"),3000);
-}
-
-/* ══════════════════════════════ ASSISTANT DASHBOARD ═════════════════════ */
-async function openAssistantDash(){
-  if(!S.user||S.user.role!=="assistant") return;
-  showView("v-assistant");
-  document.getElementById("bn-auth").classList.add("active");
-
-  document.getElementById("aAva").textContent  = initials(S.user.name);
-  document.getElementById("aName").textContent = S.user.name;
-  document.getElementById("aDashSub").textContent = `Hi ${S.user.name.split(" ")[0]} 👋`;
-
-  const res = await api("GET","/api/assistant/profile");
-  if(!res.success) return;
-
-  const st = res.assistant?.status||"unavailable";
-  highlightStatus(st,"asopt");
-
-  const lwEl = document.getElementById("linkedWorkerInfo");
-  if(res.linked_worker){
-    const lw = res.linked_worker;
-    lwEl.innerHTML = `<div class="lw-box">
-      <div class="lw-ava">${initials(lw.name)}</div>
-      <div><div class="lw-name">${lw.name}</div>
-           <div class="lw-cat">${t(CAT_LABELS[lw.category]||lw.category)} • ${lw.phone}</div></div>
-    </div>`;
-  } else {
-    lwEl.innerHTML = `<p style="font-size:.8rem;color:var(--muted)">${t("no_linked_worker")}</p>`;
-  }
-}
-
-async function setAssistantStatus(status){
-  const res = await api("PUT","/api/assistant/status",{status});
-  if(res.success){
-    highlightStatus(status,"asopt");
-    toast(`Status: ${t(ST_LABELS[status])}`);
-  } else {
-    toast("❌ "+res.error);
-  }
-}
-
-/* ══════════════════════════════ BOOKING MODAL ════════════════════════════ */
-function openBookingModal(worker){
-  if(!S.user){ toast("Please login to book"); openModal("m-login"); return; }
-  S.bookingWorker = worker;
-  S.bookingSlotId = null;
-
-  const bm = document.getElementById("bmWorkerInfo");
-  bm.innerHTML = `
-    <div class="bm-ava">${initials(worker.name)}</div>
-    <div>
-      <div class="bm-name">${worker.name}</div>
-      <div class="bm-cat">${t(CAT_LABELS[worker.category]||worker.category)} • ⭐${worker.rating} • 📍${worker.distance_km}km</div>
-    </div>`;
-
-  // Set min date to today
-  const today = new Date().toISOString().split("T")[0];
-  document.getElementById("bookDate").min = today;
-  document.getElementById("slotChips").innerHTML =
-    `<span class="no-slots-msg">${t("pick_date_first")}</span>`;
-
-  openModal("m-booking");
-}
-
-async function loadBookingSlots(){
-  const date = document.getElementById("bookDate").value;
-  const el   = document.getElementById("slotChips");
-  S.bookingSlotId = null;
-  if(!date||!S.bookingWorker){ el.innerHTML=`<span class="no-slots-msg">${t("pick_date_first")}</span>`; return; }
-
-  el.innerHTML = `<div class="spin" style="margin:0"></div>`;
-  const res = await api("GET",`/api/workers/${S.bookingWorker.id}/slots?date=${date}`);
-  if(!res.success||!res.slots.length){
-    el.innerHTML=`<span class="no-slots-msg">${t("no_slots_available")}</span>`; return;
-  }
-  el.innerHTML = res.slots.map(s=>`
-    <div class="slot-chip${s.is_booked?' taken':''}"
-         onclick="${s.is_booked?'':'selectSlot('+s.id+',this)'}"
-         data-slot-id="${s.id}">
-      ${s.start_time}–${s.end_time}${s.is_booked?' 🔒':''}
-    </div>`).join("");
-}
-
-function selectSlot(slotId, el){
-  document.querySelectorAll(".slot-chip").forEach(c=>c.classList.remove("sel"));
-  el.classList.add("sel");
-  S.bookingSlotId = slotId;
-}
-
-async function confirmBooking(){
-  const date  = document.getElementById("bookDate").value;
-  const notes = document.getElementById("bookNotes").value.trim();
-  const errEl = document.getElementById("bookErr");
-  errEl.classList.remove("show");
-
-  if(!date){ errEl.textContent="Please select a date"; errEl.classList.add("show"); return; }
-
-  const body = {
-    worker_id:    S.bookingWorker.id,
-    date,
-    notes,
-    ...(S.bookingSlotId?{time_slot_id:S.bookingSlotId}:{})
-  };
-
-  const res = await api("POST","/api/bookings",body);
-  if(res.success){
-    closeModal("m-booking");
-    toast(t("booking_success"));
     loadMyBookings();
-    loadWorkers();
-  } else {
-    errEl.textContent = res.error||"Booking failed";
-    errEl.classList.add("show");
+    qs('#nav-home').classList.add('active');
+  } else if (S.role === 'worker') {
+    loadWorkerDash();
+    showView('worker-dash');
+    qs('#nav-dash').classList.add('active');
+  } else if (S.role === 'assistant') {
+    loadAsstDash();
+    showView('asst-dash');
+    qs('#nav-dash').classList.add('active');
   }
+
+  // Reset login form
+  setOtpStep('phone');
+  qs('#input-phone').value = '';
+  qs('#input-otp').value = '';
+  qs('#input-name').value = '';
 }
 
-/* ══════════════════════════════ MY BOOKINGS (customer) ══════════════════ */
-async function loadMyBookings(){
-  if(!S.user||S.user.role!=="customer") return;
-  const sec  = document.getElementById("my-bk-section");
-  const el   = document.getElementById("my-bk-list");
-  sec.classList.add("show");
+function goBackToPhone() {
+  clearFieldError('otp-error');
+  setOtpStep('phone');
+}
 
-  const res = await api("GET","/api/bookings/my");
-  if(!res.success||!res.bookings.length){
-    el.innerHTML=`<p style="font-size:.8rem;color:var(--muted)">${t("no_bookings")}</p>`;
+function doLogout() {
+  apiFetch('POST', '/api/logout').catch(() => {});
+  S.token = S.role = S.userId = S.userName = S.profileId = null;
+  ['fixr_token','fixr_role','fixr_user_id','fixr_user_name','fixr_profile_id'].forEach(k => localStorage.removeItem(k));
+  updateAuthUI();
+  showView('home');
+  loadWorkers();
+  showToast(t('toast_logged_out'), 'success');
+}
+
+/* ── HOME: WORKERS ───────────────────────────────────────────── */
+let currentCatWorkers = [];
+
+function selectCat(btn) {
+  qsa('.cat-pill').forEach(p => p.classList.remove('active'));
+  btn.classList.add('active');
+  S.currentCat = btn.dataset.cat;
+  loadWorkers();
+}
+
+async function loadWorkers() {
+  const container = qs('#workers-list');
+  container.innerHTML = '<div class="spinner-wrap"><div class="spinner"></div></div>';
+  const availOnly = qs('#filter-available').checked;
+
+  let url = '/api/workers?service=' + encodeURIComponent(S.currentCat);
+  if (availOnly) url += '&status=available';
+
+  const { ok, data } = await apiFetch('GET', url);
+
+  if (!ok || !data.success) {
+    container.innerHTML = emptyState('⚠️', data.error || t('toast_error'), '');
     return;
   }
-  const BK_ST={pending:"bk_pending",confirmed:"bk_confirmed",cancelled:"bk_cancelled",completed:"bk_completed",in_progress:"bk_in_progress"};
-  el.innerHTML = res.bookings.map(b=>`
-    <div class="bk-row">
-      <div class="bk-info">
-        <div class="bk-who">${b.worker_name} <span style="font-size:.7rem;color:var(--muted);text-transform:capitalize">(${t(CAT_LABELS[b.category]||b.category)})</span></div>
-        <div class="bk-date">📅 ${b.date}${b.notes?` — ${b.notes}`:""}</div>
-      </div>
-      <span class="bk-st ${b.status}">${t(BK_ST[b.status]||b.status)}</span>
-    </div>`).join("");
+
+  const workers = data.workers || [];
+  currentCatWorkers = workers;
+  const catLabel = qs('.cat-pill.active span[data-i18n]')?.textContent || S.currentCat;
+  qs('#workers-section-title').textContent = catLabel;
+  qs('#workers-count').textContent = workers.length ? workers.length + ' found' : '';
+
+  if (!workers.length) {
+    container.innerHTML = emptyState('🔍', t('no_workers'), t('no_workers_sub'));
+    return;
+  }
+
+  container.innerHTML = workers.map((w, i) => workerCardHtml(w, i)).join('');
 }
 
-/* ══════════════════════════════ BOTTOM NAV ═══════════════════════════════ */
-function navTo(dest){
-  if(dest==="home"){ showView("v-customer"); loadWorkers(); }
-  else if(dest==="auth"){
-    if(!S.user) openModal("m-login");
-    else if(S.user.role==="worker") openWorkerDash();
-    else if(S.user.role==="assistant") openAssistantDash();
-    else {
-      showView("v-customer");
-      loadMyBookings();
-      document.getElementById("my-bk-section").scrollIntoView({behavior:"smooth"});
+function workerCardHtml(w, i) {
+  const st = w.status || 'unavailable';
+  const canBook = S.token && S.role === 'customer' && st === 'available';
+  const canCall = st === 'available';
+  const ns = w.next_slot;
+  const slotLine = ns
+    ? `<div class="next-slot">🕐 ${t('next_slot')} ${escHtml(ns.date)} ${escHtml(ns.start_time)}–${escHtml(ns.end_time)}</div>`
+    : '';
+  const stLabel = st === 'available' ? t('status_available') : st === 'on_job' ? t('status_on_job') : t('status_unavailable');
+  const stBadge = `<span class="status-badge ${st}">${stLabel}</span>`;
+
+  return `
+  <div class="worker-card" style="animation-delay:${i * 40}ms">
+    <div class="worker-avatar">
+      ${escHtml(initials(w.name))}
+      <div class="status-ring ${st}"></div>
+    </div>
+    <div class="worker-info">
+      <div class="worker-name">${escHtml(w.name)}</div>
+      <div class="worker-meta">
+        <div class="stars-row" title="${w.rating}/5">
+          <span style="color:var(--gold);font-size:.72rem">${starsHtml(w.rating)}</span>
+          <span class="rating-num">${w.rating}</span>
+        </div>
+        <span class="dist-tag">📍 ${w.distance_km} km</span>
+        ${stBadge}
+      </div>
+      ${slotLine}
+    </div>
+    <div class="worker-actions">
+      ${canCall ? `<button class="btn btn-ghost btn-sm" onclick="callWorker('${escHtml(w.phone)}','${escHtml(w.name)}')">${t('call_now')}</button>` : ''}
+      ${canBook
+        ? `<button class="btn btn-gold btn-sm" onclick="openBookingModal(${w.id})">${t('book_now')}</button>`
+        : (!S.token ? `<button class="btn btn-ghost btn-sm" onclick="navTo('login')">${t('book_now')}</button>` : `<span class="status-badge unavailable">${t('status_busy')}</span>`)
+      }
+    </div>
+  </div>`;
+}
+
+function callWorker(phone, name) {
+  window.open('tel:' + phone, '_self');
+}
+
+function emptyState(icon, title, sub) {
+  return `<div class="empty-state">
+    <div class="empty-icon">${icon}</div>
+    <div class="empty-title">${escHtml(title)}</div>
+    ${sub ? `<div class="empty-sub">${escHtml(sub)}</div>` : ''}
+  </div>`;
+}
+
+/* ── MY BOOKINGS ─────────────────────────────────────────────── */
+async function loadMyBookings() {
+  if (!S.token || S.role !== 'customer') return;
+  const strip = qs('#my-bookings-strip');
+  strip.classList.add('show');
+  const list = qs('#my-bookings-list');
+  list.innerHTML = '<div class="spinner-wrap" style="padding:20px"><div class="spinner"></div></div>';
+
+  const { ok, data } = await apiFetch('GET', '/api/bookings/my');
+  if (!ok || !data.success) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  const bks = data.bookings || [];
+  if (!bks.length) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  list.innerHTML = bks.map(b => `
+    <div class="booking-item">
+      <div class="booking-detail">
+        <div class="booking-title">${escHtml(b.worker_name || 'Worker')}</div>
+        <div class="booking-sub">${escHtml(b.category || '')} · ${fmtDate(b.date)}${b.notes ? ' · ' + escHtml(b.notes) : ''}</div>
+      </div>
+      <span class="bk-status ${b.status || 'pending'}">${escHtml(b.status || 'pending')}</span>
+    </div>`).join('');
+}
+
+/* ── BOOKING MODAL ───────────────────────────────────────────── */
+function openBookingModal(workerId) {
+  if (!S.token) { navTo('login'); return; }
+  const w = currentCatWorkers.find(x => x.id === workerId);
+  if (!w) return;
+  S.bookingWorker = w;
+  S.selectedSlotId = null;
+
+  qs('#modal-book-worker-name').textContent = w.name + ' · ⭐ ' + w.rating + ' · 📍 ' + w.distance_km + ' km';
+  qs('#book-date').value = '';
+  qs('#book-notes').value = '';
+  qs('#slot-chips').innerHTML = `<span class="no-slots-msg">${t('pick_date_first')}</span>`;
+  qs('#book-error').classList.remove('show');
+  qs('#book-success').classList.remove('show');
+  qs('#book-date').min = today();
+
+  qs('#modal-booking').classList.add('open');
+}
+
+function closeBookingModal(e) {
+  if (e && e.target !== qs('#modal-booking')) return;
+  qs('#modal-booking').classList.remove('open');
+  S.bookingWorker = null;
+  S.selectedSlotId = null;
+}
+
+async function loadSlotsForDate() {
+  if (!S.bookingWorker) return;
+  const date = qs('#book-date').value;
+  if (!date) return;
+  S.selectedSlotId = null;
+
+  const chipsEl = qs('#slot-chips');
+  chipsEl.innerHTML = '<div class="spinner" style="width:20px;height:20px;border-width:2px"></div>';
+
+  const { ok, data } = await apiFetch('GET', `/api/workers/${S.bookingWorker.id}/slots?date=${date}`);
+  if (!ok || !data.success) { chipsEl.innerHTML = `<span class="no-slots-msg">${t('no_slots')}</span>`; return; }
+
+  const slots = data.slots || [];
+  if (!slots.length) { chipsEl.innerHTML = `<span class="no-slots-msg">${t('no_slots')}</span>`; return; }
+
+  chipsEl.innerHTML = slots.map(sl => `
+    <div class="slot-chip ${sl.is_booked ? 'booked' : ''}" data-slot-id="${sl.id}"
+      onclick="${sl.is_booked ? '' : `selectSlot(this, ${sl.id})`}">
+      ${escHtml(sl.start_time)}–${escHtml(sl.end_time)}${sl.is_booked ? ' 🔒' : ''}
+    </div>`).join('');
+}
+
+function selectSlot(el, slotId) {
+  qsa('.slot-chip').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  S.selectedSlotId = slotId;
+}
+
+async function confirmBooking() {
+  const date = qs('#book-date').value;
+  const notes = qs('#book-notes').value.trim();
+  const errEl = qs('#book-error');
+  const okEl = qs('#book-success');
+  errEl.classList.remove('show');
+  okEl.classList.remove('show');
+
+  if (!date) { errEl.textContent = 'Please select a date'; errEl.classList.add('show'); return; }
+  if (!S.bookingWorker) return;
+
+  const btn = qs('#confirm-book-btn');
+  btn.disabled = true;
+  btn.textContent = t('loading');
+
+  const body = { worker_id: S.bookingWorker.id, date, notes };
+  if (S.selectedSlotId) body.time_slot_id = S.selectedSlotId;
+
+  const { ok, data } = await apiFetch('POST', '/api/bookings', body);
+  btn.disabled = false;
+  btn.textContent = t('btn_confirm_book');
+
+  if (!ok || !data.success) {
+    errEl.textContent = data.error || t('toast_error');
+    errEl.classList.add('show');
+    return;
+  }
+
+  okEl.textContent = t('toast_booked');
+  okEl.classList.add('show');
+  showToast(t('toast_booked'), 'success');
+  setTimeout(() => {
+    qs('#modal-booking').classList.remove('open');
+    loadWorkers();
+    loadMyBookings();
+  }, 1400);
+}
+
+/* ── WORKER DASHBOARD ────────────────────────────────────────── */
+async function loadWorkerDash() {
+  const { ok, data } = await apiFetch('GET', '/api/me');
+  if (!ok || !data.success) return;
+
+  const user = data.user || {};
+  const profile = data.profile || {};
+
+  if (profile.id) { S.profileId = profile.id; localStorage.setItem('fixr_profile_id', profile.id); }
+  S.workerStatus = profile.status || 'available';
+  S.userName = user.name || S.userName;
+
+  qs('#worker-dash-name').textContent = S.userName || user.name || '';
+  setWorkerStatusUI(S.workerStatus);
+
+  if (S.profileId) {
+    loadWorkerSlots();
+    loadWorkerBookings();
+  }
+}
+
+function setWorkerStatusUI(status) {
+  qsa('[id^="sopt-"]').forEach(el => el.className = 'status-opt');
+  const opt = qs('#sopt-' + status);
+  if (opt) opt.classList.add('active-' + status);
+}
+
+async function setWorkerStatus(status) {
+  if (!S.profileId) return;
+  S.workerStatus = status;
+  setWorkerStatusUI(status);
+  const { ok, data } = await apiFetch('PUT', `/api/workers/${S.profileId}/status`, { status });
+  if (ok && data.success) showToast(t('toast_status_saved'), 'success');
+  else { showToast(data.error || t('toast_error'), 'error'); }
+}
+
+async function loadWorkerSlots() {
+  if (!S.profileId) return;
+  const list = qs('#worker-slots-list');
+  list.innerHTML = '<div class="spinner-wrap" style="padding:16px"><div class="spinner"></div></div>';
+
+  const { ok, data } = await apiFetch('GET', `/api/workers/${S.profileId}/slots`);
+  if (!ok || !data.success) { list.innerHTML = ''; return; }
+
+  S.workerSlots = data.slots || [];
+  renderWorkerSlots();
+}
+
+function renderWorkerSlots() {
+  const list = qs('#worker-slots-list');
+  if (!S.workerSlots.length) { list.innerHTML = '<div style="font-size:.78rem;color:var(--ink3);padding:4px 0 10px">No slots added yet</div>'; return; }
+  list.innerHTML = S.workerSlots.map(sl => `
+    <div class="slot-item">
+      <div class="slot-info">
+        <div class="slot-date">${escHtml(sl.date)}</div>
+        <div class="slot-time">${escHtml(sl.start_time)} – ${escHtml(sl.end_time)}</div>
+      </div>
+      <div style="display:flex;align-items:center;gap:8px">
+        ${sl.is_booked ? '<span class="slot-booked-badge">Booked</span>' : ''}
+        ${sl.is_booked ? '' : `<button class="btn btn-danger btn-sm" onclick="deleteSlot(${sl.id})">✕</button>`}
+      </div>
+    </div>`).join('');
+}
+
+async function addSlot() {
+  if (!S.profileId) return;
+  const date = qs('#slot-date').value;
+  const start = qs('#slot-start').value.trim();
+  const end = qs('#slot-end').value.trim();
+  if (!date || !start || !end) { showToast('Fill in date, start and end time', 'error'); return; }
+
+  const { ok, data } = await apiFetch('POST', `/api/workers/${S.profileId}/slots`, { date, start_time: start, end_time: end });
+  if (!ok || !data.success) { showToast(data.error || t('toast_error'), 'error'); return; }
+
+  showToast(t('toast_slot_added'), 'success');
+  qs('#slot-date').value = '';
+  qs('#slot-start').value = '';
+  qs('#slot-end').value = '';
+  if (data.slot) { S.workerSlots.push(data.slot); renderWorkerSlots(); }
+  else loadWorkerSlots();
+}
+
+async function deleteSlot(slotId) {
+  const { ok, data } = await apiFetch('DELETE', `/api/slots/${slotId}`);
+  if (!ok || !data.success) { showToast(data.error || t('toast_error'), 'error'); return; }
+  showToast(t('toast_slot_deleted'));
+  S.workerSlots = S.workerSlots.filter(s => s.id !== slotId);
+  renderWorkerSlots();
+}
+
+async function loadWorkerBookings() {
+  if (!S.profileId) return;
+  const list = qs('#worker-bookings-list');
+  list.innerHTML = '<div class="spinner-wrap" style="padding:16px"><div class="spinner"></div></div>';
+
+  const { ok, data } = await apiFetch('GET', `/api/workers/${S.profileId}/bookings`);
+  if (!ok || !data.success) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  const bks = data.bookings || [];
+  if (!bks.length) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  list.innerHTML = bks.map(b => `
+    <div class="dash-booking-item">
+      <div class="booking-detail">
+        <div class="booking-title">${escHtml(b.customer_name || 'Customer')}</div>
+        <div class="booking-sub">${fmtDate(b.date)}${b.notes ? ' · ' + escHtml(b.notes) : ''}</div>
+        <div class="booking-sub" style="color:var(--ink3)">${escHtml(b.customer_phone || '')}</div>
+      </div>
+      <span class="bk-status ${b.status || 'pending'}">${escHtml(b.status || 'pending')}</span>
+    </div>`).join('');
+}
+
+async function addAssistant() {
+  const phone = qs('#asst-phone-input').value.trim();
+  const errEl = qs('#asst-error');
+  const okEl = qs('#asst-success');
+  errEl.classList.remove('show');
+  okEl.classList.remove('show');
+
+  if (!phone) { errEl.textContent = t('err_phone_req'); errEl.classList.add('show'); return; }
+
+  const { ok, data } = await apiFetch('POST', '/api/assistant/request', { phone });
+  if (!ok || !data.success) { errEl.textContent = data.error || t('toast_error'); errEl.classList.add('show'); return; }
+
+  okEl.textContent = data.message || t('toast_asst_linked');
+  okEl.classList.add('show');
+  showToast(t('toast_asst_linked'), 'success');
+  qs('#asst-phone-input').value = '';
+}
+
+/* ── ASSISTANT DASHBOARD ─────────────────────────────────────── */
+async function loadAsstDash() {
+  const { ok: meOk, data: meData } = await apiFetch('GET', '/api/me');
+  if (meOk && meData.success) {
+    S.userName = meData.user?.name || S.userName;
+    qs('#asst-dash-name').textContent = S.userName;
+    if (meData.profile?.id) {
+      S.profileId = meData.profile.id;
+      localStorage.setItem('fixr_profile_id', S.profileId);
     }
+    S.assistantStatus = meData.profile?.status || 'available';
+    setAssistantStatusUI(S.assistantStatus);
   }
-  else if(dest==="bookings"){
-    showView("v-customer");
-    loadMyBookings();
-    setTimeout(()=>document.getElementById("my-bk-section").scrollIntoView({behavior:"smooth"}),200);
+
+  const { ok, data } = await apiFetch('GET', '/api/assistant/profile');
+  if (!ok || !data.success) return;
+
+  const linked = data.linked_worker;
+  const lwEl = qs('#linked-worker-container');
+  if (linked) {
+    lwEl.innerHTML = `
+      <div class="linked-worker-card">
+        <div class="linked-worker-avatar">${escHtml(initials(linked.name))}</div>
+        <div class="linked-worker-info">
+          <div class="lw-name">${escHtml(linked.name)}</div>
+          <div class="lw-cat">${escHtml(linked.category || '')} · ${escHtml(linked.phone || '')}</div>
+          <div class="lw-rating">⭐ ${linked.rating} · <span class="status-badge ${linked.status || 'unavailable'}">${linked.status || ''}</span></div>
+        </div>
+      </div>`;
+    // Load that worker's bookings as "assigned jobs"
+    loadAsstJobs(linked.id);
+  } else {
+    lwEl.innerHTML = `<div style="font-size:.8rem;color:var(--ink3)">${t('no_linked_worker')}</div>`;
   }
 }
 
-/* ══════════════════════════════ INIT ════════════════════════════════════ */
-(function init(){
+function setAssistantStatusUI(status) {
+  qsa('[id^="aopt-"]').forEach(el => el.className = 'status-opt');
+  const opt = qs('#aopt-' + status);
+  if (opt) opt.classList.add('active-' + status);
+}
+
+async function setAssistantStatus(status) {
+  S.assistantStatus = status;
+  setAssistantStatusUI(status);
+  const { ok, data } = await apiFetch('PUT', '/api/assistant/status', { status });
+  if (ok && data.success) showToast(t('toast_status_saved'), 'success');
+  else showToast(data.error || t('toast_error'), 'error');
+}
+
+async function loadAsstJobs(workerProfileId) {
+  const list = qs('#asst-jobs-list');
+  if (!workerProfileId) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  list.innerHTML = '<div class="spinner-wrap" style="padding:16px"><div class="spinner"></div></div>';
+  const { ok, data } = await apiFetch('GET', `/api/workers/${workerProfileId}/bookings`);
+  if (!ok || !data.success) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  const bks = data.bookings || [];
+  if (!bks.length) { list.innerHTML = emptyState('📋', t('no_bookings'), ''); return; }
+
+  list.innerHTML = bks.map(b => `
+    <div class="dash-booking-item">
+      <div class="booking-detail">
+        <div class="booking-title">${escHtml(b.customer_name || 'Customer')}</div>
+        <div class="booking-sub">${fmtDate(b.date)}${b.notes ? ' · ' + escHtml(b.notes) : ''}</div>
+      </div>
+      <span class="bk-status ${b.status || 'pending'}">${escHtml(b.status || 'pending')}</span>
+    </div>`).join('');
+}
+
+/* ── TOKEN REFRESH ───────────────────────────────────────────── */
+async function maybeRefreshToken() {
+  if (!S.token) return;
+  try {
+    const { ok, data } = await apiFetch('POST', '/api/token/refresh');
+    if (ok && data.success && data.token) {
+      S.token = data.token;
+      localStorage.setItem('fixr_token', S.token);
+    }
+  } catch (e) {}
+}
+
+/* ── INIT ────────────────────────────────────────────────────── */
+(function init() {
   applyLang();
-  updateHeaderBtns();
-  loadWorkers();
-  if(S.user&&S.user.role==="customer") loadMyBookings();
+  updateAuthUI();
+
+  if (S.token) {
+    // Restore session
+    if (S.role === 'customer') {
+      showView('home');
+      loadWorkers();
+      loadMyBookings();
+    } else if (S.role === 'worker') {
+      loadWorkerDash();
+      showView('worker-dash');
+    } else if (S.role === 'assistant') {
+      loadAsstDash();
+      showView('asst-dash');
+    } else {
+      showView('home');
+      loadWorkers();
+    }
+    // Refresh token silently
+    maybeRefreshToken();
+    setInterval(maybeRefreshToken, 20 * 60 * 60 * 1000);
+  } else {
+    showView('home');
+    loadWorkers();
+  }
 })();
 </script>
 </body>
