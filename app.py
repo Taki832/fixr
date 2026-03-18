@@ -12,6 +12,7 @@ from datetime import datetime, timedelta, date as _date_type
 from functools import wraps
 from flask import Flask, jsonify, request, g
 from flask_cors import CORS
+from flask import send_from_directory
 
 app = Flask(__name__)
 CORS(app, supports_credentials=True)
@@ -1264,19 +1265,23 @@ def get_assistant_profile():
 #  HEALTH
 # ══════════════════════════════════════════════════════════════════════════════
 
-@app.route("/", methods=["GET"])
+@app.route("/")
+def serve_frontend():
+    return send_from_directory(".", "index.html")
+
+
+@app.route("/api/health")
 def health():
     return ok({
         "service": "Fixr API",
         "version": "2.3",
-        "status":  "running",
+        "status": "running",
         "features": [
             "otp-auth", "token-refresh", "roles",
             "slots", "bookings", "assistants",
             "structured-logging", "exclusive-transactions",
         ],
     })
-
 
 # ══════════════════════════════════════════════════════════════════════════════
 #  STARTUP
